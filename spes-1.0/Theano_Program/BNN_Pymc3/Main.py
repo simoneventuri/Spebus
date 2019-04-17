@@ -155,9 +155,9 @@ def sgd_optimization(NNInput):
         save_ADVI_reconstruction_LEPS(PathToADVI, ADVITrace, model)
 
 
-    # plot_ADVI_trace(NNInput, ADVITrace)
+    #plot_ADVI_trace(NNInput, ADVITrace)
 
-    # plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
+    #plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
 
     #plot_SVGD_vs_ADVI(NNInput, ADVIApprox, SVGDApprox)
     ##############################################################################################

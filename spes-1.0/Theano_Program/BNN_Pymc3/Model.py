@@ -85,30 +85,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             W3Mean     = 0.0
             b3Mean     = 0.0
 
-
-        # print('G_MEAN=',G_MEAN)
-        # print('G_SD=',G_SD)
-        # print('LambdaMean=',LambdaMean)
-        # print('reMean=',reMean)
-        # print('W1Mean=',W1Mean)
-        # print('W2Mean=',W2Mean)
-        # print('W3Mean=',W3Mean)
-        # print('b1Mean=',b1Mean)
-        # print('b2Mean=',b2Mean)
-        # print('b3Mean=',b3Mean)
-
-        # print('G_MEAN=',G_MEAN)
-        # print('G_SD=',G_SD)
-        # print('LambdaIni=',LambdaIni)
-        # print('reIni=',reIni)
-        # print('W1Ini=',W1Ini)
-        # print('W2Ini=',W2Ini)
-        # print('W3Ini=',W3Ini)
-        # print('b1Ini=',b1Ini)
-        # print('b2Ini=',b2Ini)
-        # print('b3Ini=',b3Ini)
-
-    elif (NNInput.Model == 'LEPS'):
+   elif (NNInput.Model == 'LEPS'):
 
         Dei   = 9.9044
         betai = 1.4223
@@ -140,8 +117,8 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             G1 = (p0*p1*p2                                                                          - G_MEAN[1]) / G_SD[1]
             G2 = (p0**2*p1    + p0*p1**2    + p2**2*p1    + p2*p1**2    + p0**2*p2    + p0*p2**2    - G_MEAN[2]) / G_SD[2]
             G3 = (p0**3*p1    + p0*p1**3    + p2**3*p1    + p2*p1**3    + p0**3*p2    + p0*p2**3    - G_MEAN[3]) / G_SD[3]
-            G4 = (p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0 + p2*p1**2*p0 + p0**2*p2*p1 + p0*p2**2*p1 - G_MEAN[4]) / G_SD[4]
-            G5 = (p0**2*p1**2 + p0**2*p1**2 + p2**2*p1**2 + p2**2*p1**2 + p0**2*p2**2 + p0**2*p2**2 - G_MEAN[5]) / G_SD[5]
+            G4 = (p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0                                           - G_MEAN[4]) / G_SD[4]
+            G5 = (p0**2*p1**2 + p2**2*p1**2 + p0**2*p2**2                                           - G_MEAN[5]) / G_SD[5]          
 
             G0 = G0.dimshuffle((0, 1)) 
             G1 = G1.dimshuffle((0, 1)) 
@@ -155,7 +132,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
 
             
             print('    1st Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
-            WSD = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
+            WSD = 10.e0#numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
             bSD = 10.e0
             W1 = pymc3.Normal('W1', mu=W1Mean, sd=WSD, shape=(NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1]), testval=W1Ini)
             b1 = pymc3.Normal('b1', mu=b1Mean, sd=bSD, shape=(NNInput.NLayers[iLayer+1]),                          testval=b1Ini)
@@ -164,7 +141,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             iLayer = iLayer+1
 
             print('    2nd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
-            WSD = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
+            WSD = 10.e0#numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
             bSD = 10.e0
             W2 = pymc3.Normal('W2', mu=W2Mean, sd=WSD, shape=(NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1]), testval=W2Ini)
             b2 = pymc3.Normal('b2', mu=b2Mean, sd=bSD, shape=(NNInput.NLayers[iLayer+1]),                          testval=b2Ini)
@@ -173,7 +150,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             iLayer = iLayer+1
 
             print('    3rd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
-            WSD = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
+            WSD = 10.e0#numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
             bSD = 10.e0
             W3 = pymc3.Normal('W3', mu=W3Mean, sd=WSD, shape=(NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1]), testval=W3Ini)
             b3 = pymc3.Normal('b3', mu=b3Mean, sd=bSD, shape=(NNInput.NLayers[iLayer+1]),                          testval=b3Ini)
@@ -213,9 +190,8 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
 
 
         # Define likelihood
-        #yLikeApprox = pymc3.StudentT('yLikeApprox', mu=b + W * x, lam=1, nu=1, observed=y, total_size=y.eval().shape[0])
-        yNorm = yPred / T.abs_(y)**NNInput.OutputExpon
-        yObs  =     y / T.abs_(y)**NNInput.OutputExpon
+        yNorm = yPred #/ T.abs_(y)**NNInput.OutputExpon
+        yObs  =     y #/ T.abs_(y)**NNInput.OutputExpon
         Sigma = pymc3.Lognormal('Sigma', mu=0.01,  sd=2.0,   testval=10.0)
         yLike = pymc3.Normal('yLike',    mu=yNorm, sd=Sigma, observed=yObs, total_size=NNInput.NTrain)
         

@@ -11,7 +11,7 @@ class NNInput(object):
     TryNNFlg               = True
     ReadIniParamsFlg       = False
 
-    Machine = 'MAC'
+    Machine = 'ENTROPY'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
     elif (Machine == 'ENTROPY'):
@@ -27,7 +27,7 @@ class NNInput(object):
     iPES                   = '1'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
-    PreLogShift            = -4.0
+    PreLogShift            = 1.0
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
 
     Model                  = 'ModPIP'
@@ -40,8 +40,8 @@ class NNInput(object):
         LambdaVec              = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         reVec                  = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat_/' + System + '_' + iPES + '/'
-        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat_/' + System + '_' + iPES + '/'
+        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -76,13 +76,13 @@ class NNInput(object):
     RandomizeDataFlg       = True
     NormalizedDataFlg      = False
 
-    NStepsADVI             = 10000
+    NStepsADVI             = 1000000
     NTraceADVI             = 1000
     NApproxSamplesADVI     = 3000
     NParPostSamples        = 100
     NMiniBatch             = 100
 
-    PlotShow               = False
+    PlotShow               = True
     NOutPostSamples        = 100
 
     OutputExpon            = 0.0
@@ -93,8 +93,8 @@ class NNInput(object):
     MultErrorFlg           = True
     AddDiatPointsFlg       = False
 
-    #AngVector              = [60,80,100,120,140,160,180]
-    AngVector              = [60]
+    AngVector              = [60,110,116.75,170]
+    #AngVector              = [60]
     #AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
     #RCuts                  = numpy.array([2.26767, 2.26767, 2.64562, 2.28203327])
     AnglesCuts             = numpy.array([120.0])

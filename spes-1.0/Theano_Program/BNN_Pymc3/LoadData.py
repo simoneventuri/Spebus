@@ -45,10 +45,10 @@ def load_data(NNInput):
 
     def get_print_data(NNInput, Ang, mean, std):
 
-        PathToTryLabeledInput = NNInput.PathToDataFldr + '/R.csv.' + str(Ang)
+        PathToTryLabeledInput = NNInput.PathToDataFldr + '/R.csv.' + str(int(numpy.floor(Ang)))
         RPrint                = load_labeled_input(PathToTryLabeledInput)
 
-        PathToTryLabels         = NNInput.PathToDataFldr + '/E.csv.' + str(Ang)
+        PathToTryLabels         = NNInput.PathToDataFldr + '/E.csv.' + str(int(numpy.floor(Ang)))
         yPrint                  = load_labels(PathToTryLabels)
         yPrintDiat, dyPrintDiat = V_Diat_MAT_print(NNInput, RPrint)
         yPrintTriat             = yPrint - yPrintDiat

@@ -27,8 +27,8 @@ def PIP_A3(NNInput, R, LambdaVec, reVec):
     G1 = (p0*p1*p2                                                                          - G_MEAN[1]) / G_SD[1]
     G2 = (p0**2*p1    + p0*p1**2    + p2**2*p1    + p2*p1**2    + p0**2*p2    + p0*p2**2    - G_MEAN[2]) / G_SD[2]
     G3 = (p0**3*p1    + p0*p1**3    + p2**3*p1    + p2*p1**3    + p0**3*p2    + p0*p2**3    - G_MEAN[3]) / G_SD[3]
-    G4 = (p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0 + p2*p1**2*p0 + p0**2*p2*p1 + p0*p2**2*p1 - G_MEAN[4]) / G_SD[4]
-    G5 = (p0**2*p1**2 + p0**2*p1**2 + p2**2*p1**2 + p2**2*p1**2 + p0**2*p2**2 + p0**2*p2**2 - G_MEAN[5]) / G_SD[5]
+    G4 = (p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0                                           - G_MEAN[4]) / G_SD[4]
+    G5 = (p0**2*p1**2 + p2**2*p1**2 + p0**2*p2**2                                           - G_MEAN[5]) / G_SD[5]
 
     #G  = numpy.column_stack([G0,G1,G2])
     G  = numpy.column_stack([G0,G1,G2,G3,G4,G5])
