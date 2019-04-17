@@ -15,7 +15,6 @@ from PIP      import PIP_A3, PIP_A2B
 
 def construct_model(NNInput, R, y, G_MEAN, G_SD):
 
-
     if (NNInput.Model == 'PIP') or (NNInput.Model == 'ModPIP'):
 
         if (NNInput.ReadIniParamsFlg):
@@ -85,7 +84,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             W3Mean     = 0.0
             b3Mean     = 0.0
 
-   elif (NNInput.Model == 'LEPS'):
+    elif (NNInput.Model == 'LEPS'):
 
         Dei   = 9.9044
         betai = 1.4223

@@ -11,7 +11,7 @@ class NNInput(object):
     TryNNFlg               = True
     ReadIniParamsFlg       = False
 
-    Machine = 'ENTROPY'
+    Machine = 'MAC'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
     elif (Machine == 'ENTROPY'):
