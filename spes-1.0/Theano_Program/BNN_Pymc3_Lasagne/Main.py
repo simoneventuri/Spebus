@@ -31,7 +31,12 @@ from TransformOutput  import InverseTransformation
 
 def sgd_optimization(NNInput):
 
-    set_tt_rng(MRG_RandomStreams(42))
+    RandomSeed    = 42
+    set_tt_rng(MRG_RandomStreams(RandomSeed))
+
+    NSigmaSamples = 1000
+    SigmaIntCoeff = 2
+
 
     ##################################################################################################################################
     ### LOADING DATA
@@ -39,13 +44,13 @@ def sgd_optimization(NNInput):
     print('\nLoading Data ... \n')
 
     if (NNInput.TryNNFlg):
-        datasets, datasetsTry, RDataOrig, yDataOrig, yDataDiatOrig = load_data(NNInput)
+        datasets, datasetsPlot, RDataOrig, yDataOrig, yDataDiatOrig = load_data(NNInput)
     else:
-        datasets, RDataOrig, yDataOrig, yDataDiatOrig  = load_data(NNInput)
+        datasets, RDataOrig, yDataOrig, yDataDiatOrig               = load_data(NNInput)
 
     RSetTrain, ySetTrain, ySetTrainDiat, ySetTrainTriat = datasets[0]
-
-
+    RSetPlot, ySetPlot, ySetPlotDiat, ySetPlotTriat     = datasetsPlot[0]
+    RSetPlotTemp = RSetPlot
     #NNInput.NIn  = xSetTrain.get_value(borrow=True).shape[1]
     NNInput.NOut = ySetTrain.get_value(borrow=True).shape[1] 
     print(('    Nb of Input:  %i')    % NNInput.NIn)
@@ -64,10 +69,6 @@ def sgd_optimization(NNInput):
     else:
         print('    No-BATCH Version')
 
-
-    ##################################################################################################################################
-    # BUILD ACTUAL MODEL #
-    ##################################################################################################################################
 
     ##############################################################################################
     ### TESTING REAL PARAMETERS ##################################################################
@@ -94,26 +95,26 @@ def sgd_optimization(NNInput):
         i=-1
         for Ang in NNInput.AngVector:
             i=i+1
-            RSetTry,  ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[i]
+            RSetPlot,  ySetPlot, ySetPlotDiat, ySetPlotTriat  = datasetsPlot[i]
             if (NNInput.Model == 'PIP') or (NNInput.Model == 'ModPIP'):
-                yPredInitial       = try_model_PIP(NNInput, RSetTry.get_value(borrow=True), LambdaVec, reVec, WIni, bIni)
+                yPredInitial       = try_model_PIP(NNInput, RSetPlot.get_value(borrow=True), LambdaVec, reVec, WIni, bIni)
             elif (NNInput.Model == 'LEPS'):
-                yPredInitial       = try_model_LEPS(NNInput, RSetTry.get_value(borrow=True), DeiVec, betaiVec, reiVec, ki)
-            yPredInitial = InverseTransformation(NNInput, yPredInitial, ySetTryDiat.get_value())
-            PathToTryLabels = NNInput.PathToOutputFldr + '/REInitial.csv.' + str(int(numpy.floor(Ang)))
-            ySetTry = T.cast(ySetTry, 'float64')
-            ySetTry = ySetTry.eval()
-            ySetTry = InverseTransformation(NNInput, ySetTry, ySetTryDiat.get_value())
-            save_to_plot(PathToTryLabels, 'Initial', numpy.column_stack([RSetTry.get_value(), ySetTry, yPredInitial]))
-            print('    Initial Evaluation Saved in File: ', PathToTryLabels, '\n')
-        RSetTryTemp = RSetTry
-    else:
-        RSetTry, ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[0]
-        RSetTryTemp = RSetTry
+                yPredInitial       = try_model_LEPS(NNInput, RSetPlot.get_value(borrow=True), DeiVec, betaiVec, reiVec, ki)
+            yPredInitial = InverseTransformation(NNInput, yPredInitial, ySetPlotDiat.get_value())
+            PathToPlotLabels = NNInput.PathToOutputFldr + '/REInitial.csv.' + str(int(numpy.floor(Ang)))
+            ySetPlot = T.cast(ySetPlot, 'float64')
+            ySetPlot = ySetPlot.eval()
+            ySetPlot = InverseTransformation(NNInput, ySetPlot, ySetPlotDiat.get_value())
+            save_to_plot(PathToPlotLabels, 'Initial', numpy.column_stack([RSetPlot.get_value(), ySetPlot, yPredInitial]))
+            print('    Initial Evaluation Saved in File: ', PathToPlotLabels, '\n')
+        RSetPlotTemp = RSetPlot        
     ##############################################################################################
 
-    
-    ### COMPUTING POSTERIOR ######################################################################
+
+    ##################################################################################################################################
+    # BUILD ACTUAL MODEL #
+    ##################################################################################################################################    
+    ### COMPUTING / UPDATING INFERENCE ######################################################################
     # print(RSetTrain.get_value())
     # print(ySetTrain.get_value())
     # time.sleep(5)
@@ -125,45 +126,44 @@ def sgd_optimization(NNInput):
             RSetTrainTemp      = RSetTrain
             ySetTrainTemp      = ySetTrain
             NNInput.NMiniBatch = NNInput.NTrain
-        ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred, Layers = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
+        #ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yPred, Sigma, Layers = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
+        ADVIApprox, ADVIInference, SVGDApprox, NUTSTrace, Params, yPred = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
+        #
         plot_ADVI_ELBO(NNInput, ADVIInference)
-        #plot_ADVI_posterior(NNInput, ADVIApprox)
-        
-        ADVITrace = ADVIApprox.sample(draws=NNInput.NTraceADVI)
-        
-        #PathToModTrace = NNInput.PathToOutputFldr + '/Model&Trace.pkl'
-        #with open(PathToModTrace, 'wb') as buff:
-        #    pickle.dump({'model': model, 'trace': ADVITrace, 'tracker': ADVITracker, 'inference': ADVIInference, 'approx': ADVIApprox, 'yLike': yLike}, buff)
-    
+        #
+        if (NNInput.SaveInference):
+            PathToModTrace = NNInput.PathToOutputFldr + '/Approx&Preds.pkl'
+            with open(PathToModTrace, 'wb') as buff:
+                #pickle.dump({'model': model, 'trace': ADVITrace, 'tracker': ADVITracker, 'inference': ADVIInference, 'approx': ADVIApprox, 'yLike': yLike}, buff)
+                pickle.dump({'ADVIApprox': ADVIApprox, 'Params': Params, 'yPred': yPred}, buff)
+        #
     else:
         PathToWeightFldr = NNInput.PathToOutputFldr + '/Model&Trace.pkl'
         with open(PathToWeightFldr, 'rb') as buff:
             data = pickle.load(buff)  
-        model, ADVITrace, ADVITracker, ADVIInference, ADVIApprox, yLike = data['model'], data['trace'], data['tracker'], data['inference'], data['approx'], data['yLike']
-        RSetTry, ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[0]
-        RSetTryTemp = RSetTry
+        #model, ADVITrace, ADVITracker, ADVIInference, ADVIApprox, yPred = data['model'], data['trace'], data['tracker'], data['inference'], data['approx'], data['yPred']
+        ADVIApprox, Params, yPred = data['ADVIApprox'], data['Params'], data['yPred']
+        RSetPlot, ySetPlot, ySetPlotDiat, ySetPlotTriat  = datasetsPlot[0]
+        RSetPlotTemp = RSetPlot
+   
+    if (NNInput.NTraceADVI > 0):
+        ADVITrace = ADVIApprox.sample(draws=NNInput.NTraceADVI)      
+        plot_ADVI_trace(NNInput, ADVITrace)
+    else:
+        ADVITrace = 1
+    ##############################################################################################
 
 
-    PathToADVI = NNInput.PathToOutputFldr + '/OutputPosts/'
-    if not os.path.exists(PathToADVI):
-        os.makedirs(PathToADVI)
+    ### SAMPLING PARAMETERS POSTERIOR #######################################################################
     PathToADVI = NNInput.PathToOutputFldr + '/ParamsPosts/'
     if not os.path.exists(PathToADVI):
         os.makedirs(PathToADVI)
 
-
     if (NNInput.Model == 'PIP') or (NNInput.Model == 'ModPIP'):
-        save_ADVI_reconstruction_PIP(PathToADVI, ADVITrace, model)
-        save_ADVI_sample_PIP(PathToADVI, ADVITrace, NNInput.NTraceADVI, NNInput.NParPostSamples, model)
+        save_ADVI_reconstruction_PIP(NNInput, PathToADVI, ADVIApprox, Params)
+        save_ADVI_sample_PIP(NNInput, PathToADVI, ADVIApprox, Params)
     elif (NNInput.Model == 'LEPS'):
-        save_ADVI_reconstruction_LEPS(PathToADVI, ADVITrace, model)
-
-
-    plot_ADVI_trace(NNInput, ADVITrace)
-
-    #plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
-
-    #plot_SVGD_vs_ADVI(NNInput, ADVIApprox, SVGDApprox)
+        save_ADVI_reconstruction_LEPS(PathToADVI, ADVIApprox, Params)
     ##############################################################################################
 
 
@@ -255,41 +255,71 @@ def sgd_optimization(NNInput):
     # #############################################################################################
 
 
-    ### SAMPLING POSTERIOR #######################################################################
+    ### SAMPLING OUTPUT POSTERIOR #######################################################################
+    PathToADVI = NNInput.PathToOutputFldr + '/OutputPosts/'
+    if not os.path.exists(PathToADVI):
+        os.makedirs(PathToADVI)
+
     x = T.dmatrix('X')
     n = T.iscalar('n')
-    x.tag.test_value = numpy.empty_like(RSetTryTemp)
-    x.tag.test_value = numpy.random.randint(100,size=(100,3))
-    n.tag.test_value = 100
-    #_sample_proba = ADVIApprox.sample_node(yLike.distribution.mean, size=n, more_replacements={xSetTrainTemp : x})
-    _sample_proba = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrainTemp: x})
-    sample_proba  = theano.function([x, n], _sample_proba)
+    x.tag.test_value    = numpy.empty_like(RSetPlotTemp)
+    x.tag.test_value    = numpy.random.randint(100,size=(100,3))
+    n.tag.test_value    = 100
+    _sample_proba_yPred = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrainTemp: x})
+    sample_proba_yPred  = theano.function([x, n], _sample_proba_yPred)
+
+    m                       = T.iscalar('m')
+    _sample_proba_SigmaPred = ADVIApprox.sample_node(Params.get('Sigma'), size=n*m)
+    sample_proba_SigmaPred  = theano.function([n,m], _sample_proba_SigmaPred)
+    SigmaPred               = sample_proba_SigmaPred(NNInput.NParPostSamples, NSigmaSamples)
+    SigmaPred               = numpy.reshape(SigmaPred, (NNInput.NOutPostSamples, NSigmaSamples))
 
     i=-1
     for Ang in NNInput.AngVector:
-        i=i+1   
-        RSetTry, ySetTry, ySetTryDiat, ySetTryTriat = datasetsTry[i]
-        yPredTry = sample_proba(RSetTry.get_value(borrow=True), NNInput.NOutPostSamples)
-        ySetTry  = T.cast(ySetTry, 'float64')
-        ySetTry  = ySetTry.eval()
-        ySetTry  = InverseTransformation(NNInput, ySetTry, ySetTryDiat.get_value())
-        yPredSum    = ySetTry * 0.0
-        yPredSumSqr = ySetTry * 0.0
+        numpy.random.seed(RandomSeed)
+        pymc3.set_tt_rng(RandomSeed)
+        i=i+1 
+
+        RSetPlot, ySetPlot, ySetPlotDiat, ySetPlotTriat = datasetsPlot[i]
+        ySetPlot     = T.cast(ySetPlot, 'float64')
+        ySetPlot     = ySetPlot.eval()
+        #ySetPlot     = InverseTransformation(NNInput, ySetPlot, ySetPlotDiat.get_value())
+        yPredPlot   = sample_proba_yPred(RSetPlot.get_value(borrow=True), NNInput.NOutPostSamples)
+        yPredSum    = ySetPlot * 0.0
+        yPredSumSqr = ySetPlot * 0.0
+        yPostSum    = ySetPlot * 0.0
+        yPostSumSqr = ySetPlot * 0.0
         for j in range(NNInput.NOutPostSamples):
-            #PathToTryLabels = NNInput.PathToOutputFldr + '/REPostSamples' + str(Ang) + '.csv.' + str(j+1) 
-            #yPredTemp = numpy.array(yPredTry[j,:]) 
-            #save_to_plot(PathToTryLabels, 'PostSamples', numpy.column_stack([xPlot, yPredTemp[:,-1]]))
-            yPredTemp   = numpy.array(yPredTry[j,:])
-            yPredTemp   = InverseTransformation(NNInput, yPredTemp, ySetTryDiat.get_value()) 
+            yPredTemp   = numpy.array(yPredPlot[j,:])
+            if (NNInput.AddNoiseToPredsFlg):
+                for k in range(NSigmaSamples):
+                    SigmaTemp   = SigmaPred[j,k]
+                    yPostTemp   = yPredTemp + numpy.random.normal(loc=0.0, scale=SigmaTemp)
+                    yPostTemp   = InverseTransformation(NNInput, yPostTemp, ySetPlotDiat.get_value()) 
+                    yPostSum    = yPostSum    + yPostTemp
+                    yPostSumSqr = yPostSumSqr + numpy.square(yPostTemp) 
+            yPredTemp   = InverseTransformation(NNInput, yPredTemp, ySetPlotDiat.get_value()) 
             yPredSum    = yPredSum    + yPredTemp
             yPredSumSqr = yPredSumSqr + numpy.square(yPredTemp)
+        
         yMean       = yPredSum / NNInput.NOutPostSamples
         yStD        = numpy.sqrt(yPredSumSqr / NNInput.NOutPostSamples - numpy.square(yMean))
-        yPlus       = yMean + 3.0 * yStD
-        yMinus      = yMean - 3.0 * yStD
-        PathToTryLabels = NNInput.PathToOutputFldr + '/OutputPosts/Post' + str(int(numpy.floor(Ang))) + '.csv'
-        save_moments(PathToTryLabels, 'yPost', numpy.column_stack([RSetTry.get_value(), ySetTry, yMean, yStD, yMinus, yPlus]))
-    print('Wrote Sampled yPost')
+        yPlus       = yMean + SigmaIntCoeff * yStD
+        yMinus      = yMean - SigmaIntCoeff * yStD
+        PathToPlotLabels = NNInput.PathToOutputFldr + '/OutputPosts/yPred' + str(int(numpy.floor(Ang))) + '.csv'
+        save_moments(PathToPlotLabels, 'yPred', numpy.column_stack([RSetPlot.get_value(), ySetPlot, yMean, yStD, yMinus, yPlus]))
+        print('    Wrote Sampled yPred for Angle ', Ang, '\n')
+
+        if (NNInput.AddNoiseToPredsFlg):
+            yMean       = yPostSum / NNInput.NOutPostSamples
+            yStD        = numpy.sqrt(yPostSumSqr / NNInput.NOutPostSamples - numpy.square(yMean))
+            yPlus       = yMean + SigmaIntCoeff * yStD
+            yMinus      = yMean - SigmaIntCoeff * yStD
+            PathToPlotLabels = NNInput.PathToOutputFldr + '/OutputPosts/yPost' + str(int(numpy.floor(Ang))) + '.csv'
+            save_moments(PathToPlotLabels, 'yPost', numpy.column_stack([RSetPlot.get_value(), ySetPlot, yMean, yStD, yMinus, yPlus]))
+            print('    Wrote Sampled yPost for Angle ', Ang, '\n')
+
+    
     ##############################################################################################
 
     ### PLOTTING OUTPUT POSTERIOR ################################################################
@@ -307,7 +337,7 @@ def sgd_optimization(NNInput):
 
 # def evaluate_model(NNInput):
 
-#     datasets, datasetsTry = load_data(NNInput)
+#     datasets, datasetsPlot = load_data(NNInput)
 #     xSetTry,  ySetTry     = datasetsTry
 #     NTry                  = xSetTry.get_value(borrow=True).shape[0]
 #     NBatchTry             = NTry // NNInput.NMiniBatch

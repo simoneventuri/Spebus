@@ -23,7 +23,7 @@ def Transformation(NNInput, yData, yDataTriat):
 def InverseTransformation(NNInput, yData, yDataDiat):
 
     if (NNInput.MultErrorFlg):
-        #yData = numpy.exp(yData) 
+        yData = numpy.exp(yData) 
         yData = yData - NNInput.PreLogShift
     if (NNInput.OnlyTriatFlg):
         yData = yData + yDataDiat

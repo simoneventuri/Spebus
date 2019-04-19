@@ -11,9 +11,11 @@ from NNInput import NNInput
 def plot_ADVI_ELBO(NNInput, inference):
 
     fig = plt.figure()
+    ax = fig.add_subplot(111)
     plt.plot(inference.hist)
     plt.ylabel('ELBO')
     plt.xlabel('iteration')
+    ax.set_yscale('log')
     if (NNInput.PlotShow):
         plt.show()
     FigPath = NNInput.PathToOutputFldr + '/ADVI_ELBO.png'
@@ -24,15 +26,14 @@ def plot_ADVI_ELBO(NNInput, inference):
 
 def plot_ADVI_trace(NNInput, ADVITrace):
     
-    fig = plt.figure()
-    pymc3.traceplot(ADVITrace)
-    #if (NNInput.PlotShow):
-    #    plt.show()
-    plt.show()
+    fig, axs = plt.subplots(9, 2)
+    ax = pymc3.traceplot(ADVITrace, ax=axs)
+    if (NNInput.PlotShow):
+        plt.show()
     FigPath = NNInput.PathToOutputFldr + '/ADVI_Trace.png'
-    fig.savefig(FigPath)
-    #if not (NNInput.PlotShow):
-    #    plt.close()
+    fig.savefig(FigPath, dpi=1000, papertype='legal')
+    if not (NNInput.PlotShow):
+        plt.close()
 
 
 def plot_ADVI_posterior(NNInput, ADVIApprox):

@@ -7,15 +7,26 @@ from DiatPot_N2_DS  import V_N2_DS, V_N2_LeRoy
 
 class NNInput(object):
 
-    TrainFlg               = True
-    TryNNFlg               = True
-    ReadIniParamsFlg       = False
+    TrainFlg         = True
+    TryNNFlg         = True
+    ReadIniParamsFlg = False
+    SaveInference    = False
 
-    Machine = 'ENTROPY'
+    Machine = 'MAC'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
+        NStepsADVI             = 3000
+        NTraceADVI             = 1000
+        NParPostSamples        = 100
+        NOutPostSamples        = 100
+        PlotShow               = True
     elif (Machine == 'ENTROPY'):
         PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
+        NStepsADVI             = 3000000
+        NTraceADVI             = 1000
+        NParPostSamples        = 300
+        NOutPostSamples        = 1000
+        PlotShow               = False
 
     # System                 = 'N3'
     # iPES                   = '1'
@@ -77,15 +88,9 @@ class NNInput(object):
     RandomizeDataFlg       = True
     NormalizedDataFlg      = False
 
-    NStepsADVI             = 3000000
-    NTraceADVI             = 1000
-    NApproxSamplesADVI     = 3000
-    NParPostSamples        = 100
     NMiniBatch             = 0
-
-    PlotShow               = True
-    NOutPostSamples        = 100
-
+    AddNoiseToPredsFlg     = True
+    
     OutputExpon            = 0.0
     Power                  = 5.0
     Shift                  = 7.27216
@@ -156,7 +161,8 @@ class NNInput(object):
                  Shift, 
                  Power,
                  NBatchTrain,
-                 TwoLevelsFlg):
+                 TwoLevelsFlg, 
+                 SaveInference):
 
             self.TrainFlg               = TrainFlg
             self.TryNNFlg               = TryNNFlg
@@ -214,3 +220,5 @@ class NNInput(object):
             self.NBatchTrain            = 0
 
             self.TwoLevelsFlg           = TwoLevelsFlg
+
+            self.SaveInference          = SaveInference

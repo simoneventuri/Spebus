@@ -12,6 +12,7 @@ import lasagne
 
 from NNInput  import NNInput
 from LoadData import load_parameters, load_parameters_PIP, load_scales
+from Plot     import plot_ADVI_convergence
 import PIP      
 import BondOrder 
 
@@ -30,7 +31,7 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         print('\n    1st Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1])) 
         if (NNInput.TwoLevelsFlg):
-            W1Hyper = pymc3.HalfNormal('W1Hyper', sd=1.0)
+            W1Hyper = pymc3.HalfNormal('W1Hyper', sd=5.0)
         else:
             W1Hyper = 5.0
         W1      = pymc3.Normal('W1', mu=0.0, sd=W1Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
@@ -40,7 +41,7 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         print('    2nd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
         if (NNInput.TwoLevelsFlg):
-            W2Hyper = pymc3.HalfNormal('W2Hyper', sd=1.0)
+            W2Hyper = pymc3.HalfNormal('W2Hyper', sd=5.0)
         else:
             W2Hyper = 5.0
         W2      = pymc3.Normal('W2', mu=0.0, sd=W2Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
@@ -50,12 +51,13 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         print('    3rd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
         if (NNInput.TwoLevelsFlg):
-            W3Hyper = pymc3.HalfNormal('W3Hyper', sd=1.0)
+            W3Hyper = pymc3.HalfNormal('W3Hyper', sd=5.0)
         else:
             W3Hyper = 5.0
         W3      = pymc3.Normal('W3', mu=0.0, sd=W3Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
         b3      = pymc3.Normal('b3', mu=0.0, sd=10.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
 
+        Params  = {'Lambda':Lambda,'re':re, 'W1':W1,'b1':b1, 'W2':W2,'b2':b2, 'W3':W3,'b3':b3, 'Sigma':Sigma}
 
         iLayer=0;        InputL     = lasagne.layers.InputLayer((None, NNInput.NLayers[iLayer]),  input_var=Input,                                     name=NNInput.LayersName[iLayer])
         iLayer=iLayer+1; BOL        =           BondOrder_Layer(InputL, Lambda=Lambda, re=re,                                                          name=NNInput.LayersName[iLayer])   
@@ -73,27 +75,28 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         
 
         # Inference!
-
-        ADVIInference = 0
-        ADVITracker   = 0 
-        ADVIApprox    = 0
-        #ADVIInference = pymc3.ADVI()
-        #ADVITracker   = pymc3.callbacks.Tracker(mean=ADVIInference.approx.mean.eval, std=ADVIInference.approx.std.eval)
+        #ADVIInference = 0
+        #ADVITracker   = 0 
+        #ADVIApprox    = 0
+        ADVIInference = pymc3.ADVI()
+        ADVITracker   = pymc3.callbacks.Tracker(mean=ADVIInference.approx.mean.eval, std=ADVIInference.approx.std.eval)
         ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
         #ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference)
-
+        plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
 
         SVGDApprox = 0
         #SVGDApprox = pymc3.fit(300, method='svgd', inf_kwargs=dict(n_particles=1000), obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
+        #plot_SVGD_vs_ADVI(NNInput, ADVIApprox, SVGDApprox)
 
         NUTSTrace = 0
         #UTSTrace = pymc3.sample(2000, step, start=approx.sample()[0], progressbar=True, njobs=1)
         #NUTSTrace = pymc3.sample(200, tune=1000, njobs=2, progressbar=True)
 
-
         #MCMCTrace = pymc3.sample(200000, step=pymc3.Metropolis(), tune=10000)
 
-        return ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred, Layers
+
+        #return ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yPred, Sigma, Layers
+        return ADVIApprox, ADVIInference, SVGDApprox, NUTSTrace, Params, yPred
 
 
 class GaussWeightsLambda(object):

@@ -10,7 +10,7 @@ global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample Final
 
 AbscissaConverter    = 1.0;%0.529177
      
-System               = 'N3'    
+System               = 'O3'    
  
 NHL                  = [6,10,10,1];
 MultErrorFlg         = true
@@ -48,9 +48,9 @@ elseif strcmp(System,'O3')
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
   RMin                 = 2.2820248
   ShiftScatter         = 26.3*0.04336411530877
-  %EGroupsVec           = [4.336, 8.673, 21.68, 43.364, 100.0];
-  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0];
-  PreLogShift          = -4.0
+  EGroupsVec           = [4.336, 8.673, 21.68, 43.364, 100.0];
+  %EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0];
+  PreLogShift          = -3.0
 end
 
 NCuts                = length(RCutsVec)
@@ -701,7 +701,7 @@ end
 %% ADDING DIATOMIC 
 function AddDiatomPot(iAng, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3)
   
-  global RFile Network_Folder RMin System AbscissaConverter
+  global RFile Network_Folder RMin System AbscissaConverter OnlyTriatFlg
   
   filename = strcat(RFile,'/RE.csv.',num2str(iAng));
   delimiter = ',';
@@ -719,7 +719,7 @@ function AddDiatomPot(iAng, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3)
     
   RMinVec     = [RMin, 50.0, 50.0];
   [PredShift] = ComputeOutput(RMinVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3);
-  [EAllPred]  = ComputeOutput(R,       Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3) - PredShift;
+  [EAllPred]  = ComputeOutput(R,       Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3);% - PredShift;
   
   
   if strcmp(System,'N3')
@@ -740,7 +740,11 @@ function AddDiatomPot(iAng, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3)
   end
   
   EAllFitted = ETriatFitted + EDiat - FittedShift;
-  ETriatPred = EAllPred     - EDiat;
+  if (OnlyTriatFlg)
+    ETriatPred = EAllPred     - EDiat;
+  else
+    ETriatPred = EAllPred;
+  end
   
   filename = strcat(Network_Folder,'/RE_All.csv.',num2str(iAng));
   fileID = fopen(filename,'w');
