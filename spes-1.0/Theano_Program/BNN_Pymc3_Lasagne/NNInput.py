@@ -11,7 +11,7 @@ class NNInput(object):
     TryNNFlg               = True
     ReadIniParamsFlg       = False
 
-    Machine = 'MAC'
+    Machine = 'ENTROPY'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
     elif (Machine == 'ENTROPY'):
@@ -32,9 +32,10 @@ class NNInput(object):
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
+    TwoLevelsFlg           = False
     if (Model=='ModPIP'):
         LayersName             = ['InputLayer',              'BondOrderLayer',                    'PIPLayer',              'HiddenLayer1',              'HiddenLayer2',                 'OutputLayer']
-        ActFun                 = [              lasagne.nonlinearities.linear, lasagne.nonlinearities.linear,             pymc3.math.tanh,             pymc3.math.tanh, lasagne.nonlinearities.linear]
+        ActFun                 = [              lasagne.nonlinearities.linear, lasagne.nonlinearities.linear, lasagne.nonlinearities.tanh, lasagne.nonlinearities.tanh, lasagne.nonlinearities.linear]
         NHid                   = [                                          3,                             6,                          10,                           10                              ]
         NLayers                = []
         LambdaVec              = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
@@ -76,7 +77,7 @@ class NNInput(object):
     RandomizeDataFlg       = True
     NormalizedDataFlg      = False
 
-    NStepsADVI             = 50000
+    NStepsADVI             = 3000000
     NTraceADVI             = 1000
     NApproxSamplesADVI     = 3000
     NParPostSamples        = 100
@@ -93,8 +94,8 @@ class NNInput(object):
     MultErrorFlg           = True
     AddDiatPointsFlg       = False
 
-    #AngVector              = [60,110,116.75,170]
-    AngVector              = [60]
+    AngVector              = [60,110,116.75,170]
+    #AngVector              = [60]
     #AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
     #RCuts                  = numpy.array([2.26767, 2.26767, 2.64562, 2.28203327])
     AnglesCuts             = numpy.array([120.0])
@@ -154,7 +155,8 @@ class NNInput(object):
                  AbscissaConverter, 
                  Shift, 
                  Power,
-                 NBatchTrain):
+                 NBatchTrain,
+                 TwoLevelsFlg):
 
             self.TrainFlg               = TrainFlg
             self.TryNNFlg               = TryNNFlg
@@ -210,3 +212,5 @@ class NNInput(object):
             
             self.AbscissaConverter      = AbscissaConverter
             self.NBatchTrain            = 0
+
+            self.TwoLevelsFlg           = TwoLevelsFlg

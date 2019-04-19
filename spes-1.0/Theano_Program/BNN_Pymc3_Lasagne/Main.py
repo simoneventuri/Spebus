@@ -62,7 +62,6 @@ def sgd_optimization(NNInput):
         NNInput.NBatchTrain = NNInput.NTrain // NNInput.NMiniBatch
         print(('    Nb of Training   Batches: %i') % NNInput.NBatchTrain)
     else:
-        NNInput.NBatchTrain = NNInput.NTrain
         print('    No-BATCH Version')
 
 
@@ -119,18 +118,23 @@ def sgd_optimization(NNInput):
     # print(ySetTrain.get_value())
     # time.sleep(5)
     if (NNInput.TrainFlg):
-        RSetTrainTemp  = RSetTrain
-        ySetTrainTemp  = ySetTrain
         if (NNInput.NMiniBatch > 0):
-            RSetTrainTemp  = pymc3.Minibatch(RRSetTrain.get_value(), batch_size=NNInput.NMiniBatch)
-            ySetTrainTemp  = pymc3.Minibatch(ySetTrain.get_value(),  batch_size=NNInput.NMiniBatch)
+            RSetTrainTemp  = pymc3.Minibatch(RSetTrain.get_value(), batch_size=NNInput.NMiniBatch)
+            ySetTrainTemp  = pymc3.Minibatch(ySetTrain.get_value(), batch_size=NNInput.NMiniBatch)
+        else:
+            RSetTrainTemp      = RSetTrain
+            ySetTrainTemp      = ySetTrain
+            NNInput.NMiniBatch = NNInput.NTrain
         ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred, Layers = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
         plot_ADVI_ELBO(NNInput, ADVIInference)
         #plot_ADVI_posterior(NNInput, ADVIApprox)
+        
         ADVITrace = ADVIApprox.sample(draws=NNInput.NTraceADVI)
+        
         #PathToModTrace = NNInput.PathToOutputFldr + '/Model&Trace.pkl'
         #with open(PathToModTrace, 'wb') as buff:
         #    pickle.dump({'model': model, 'trace': ADVITrace, 'tracker': ADVITracker, 'inference': ADVIInference, 'approx': ADVIApprox, 'yLike': yLike}, buff)
+    
     else:
         PathToWeightFldr = NNInput.PathToOutputFldr + '/Model&Trace.pkl'
         with open(PathToWeightFldr, 'rb') as buff:
@@ -155,7 +159,7 @@ def sgd_optimization(NNInput):
         save_ADVI_reconstruction_LEPS(PathToADVI, ADVITrace, model)
 
 
-    #plot_ADVI_trace(NNInput, ADVITrace)
+    plot_ADVI_trace(NNInput, ADVITrace)
 
     #plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
 
@@ -258,7 +262,7 @@ def sgd_optimization(NNInput):
     x.tag.test_value = numpy.random.randint(100,size=(100,3))
     n.tag.test_value = 100
     #_sample_proba = ADVIApprox.sample_node(yLike.distribution.mean, size=n, more_replacements={xSetTrainTemp : x})
-    _sample_proba = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrain: x})
+    _sample_proba = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrainTemp: x})
     sample_proba  = theano.function([x, n], _sample_proba)
 
     i=-1
