@@ -10,7 +10,7 @@ import theano.tensor as T
 from NNInput   import NNInput
 import BondOrder 
 
-def PIP_A3(NNInput, R, LambdaVec, reVec):
+def PIP_A3(NNInput, R, LambdaVec, reVec, G_MEAN, G_SD):
      
     BondOrderFun = getattr(BondOrder,NNInput.BondOrderStr)
     p0, p1, p2   = BondOrderFun(R, LambdaVec, reVec)
@@ -84,4 +84,4 @@ class PIP_A3_Layer(lasagne.layers.Layer):
         return G 
 
     def get_output_shape_for(self, input_shape):
-        return (input_shape[0], 3)
+        return (input_shape[0], 6)

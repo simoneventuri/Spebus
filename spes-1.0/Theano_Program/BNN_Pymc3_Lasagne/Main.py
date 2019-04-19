@@ -19,7 +19,7 @@ import time
 from NNInput          import NNInput
 from LoadData         import load_data, abscissa_to_plot, load_parameters, load_parameters_PIP, load_scales
 from SaveData         import save_labels, save_ADVI_reconstruction_PIP, save_ADVI_reconstruction_LEPS, save_to_plot, save_moments, save_ADVI_sample_PIP
-from Model            import construct_model, try_model_PIP, try_model_LEPS
+from Model            import construct_model, GaussWeightsW, GaussWeightsb, try_model_PIP
 from Plot             import plot_ADVI_ELBO, plot_ADVI_trace, plot_ADVI_posterior, plot_ADVI_convergence, plot_SVGD_vs_ADVI, plot_ADVI_reconstruction
 from TransformOutput  import InverseTransformation
 
@@ -30,6 +30,8 @@ from TransformOutput  import InverseTransformation
 
 
 def sgd_optimization(NNInput):
+
+    set_tt_rng(MRG_RandomStreams(42))
 
     ##################################################################################################################################
     ### LOADING DATA
@@ -64,15 +66,6 @@ def sgd_optimization(NNInput):
         print('    No-BATCH Version')
 
 
-    if (NNInput.NormalizedDataFlg):
-        PathToScalingValues = NNInput.PathToWeightFldr + '/ScalingValues.csv'
-        IniMean, IniStD     = load_scales(PathToScalingValues)
-        print('\n    Scale Values: Mean=', IniMean, '; StDev=', IniStD, '\n')
-    else:
-        IniMean = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        IniStD  = [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
-
-
     ##################################################################################################################################
     # BUILD ACTUAL MODEL #
     ##################################################################################################################################
@@ -104,7 +97,7 @@ def sgd_optimization(NNInput):
             i=i+1
             RSetTry,  ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[i]
             if (NNInput.Model == 'PIP') or (NNInput.Model == 'ModPIP'):
-                yPredInitial       = try_model_PIP(NNInput, RSetTry.get_value(borrow=True), LambdaVec, reVec, WIni, bIni, IniMean, IniStD)
+                yPredInitial       = try_model_PIP(NNInput, RSetTry.get_value(borrow=True), LambdaVec, reVec, WIni, bIni)
             elif (NNInput.Model == 'LEPS'):
                 yPredInitial       = try_model_LEPS(NNInput, RSetTry.get_value(borrow=True), DeiVec, betaiVec, reiVec, ki)
             yPredInitial = InverseTransformation(NNInput, yPredInitial, ySetTryDiat.get_value())
@@ -126,13 +119,13 @@ def sgd_optimization(NNInput):
     # print(ySetTrain.get_value())
     # time.sleep(5)
     if (NNInput.TrainFlg):
-        RSetTrainTemp  = RSetTrain.get_value()
-        ySetTrainTemp  = ySetTrain.get_value()
+        RSetTrainTemp  = RSetTrain
+        ySetTrainTemp  = ySetTrain
         if (NNInput.NMiniBatch > 0):
-            RSetTrainTemp  = pymc3.Minibatch(RSetTrainTemp, batch_size=NNInput.NMiniBatch)
-            ySetTrainTemp  = pymc3.Minibatch(ySetTrainTemp, batch_size=NNInput.NMiniBatch)
-        ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, IniMean, IniStD)
-        #plot_ADVI_ELBO(NNInput, ADVIInference)
+            RSetTrainTemp  = pymc3.Minibatch(RRSetTrain.get_value(), batch_size=NNInput.NMiniBatch)
+            ySetTrainTemp  = pymc3.Minibatch(ySetTrain.get_value(),  batch_size=NNInput.NMiniBatch)
+        ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred, Layers = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
+        plot_ADVI_ELBO(NNInput, ADVIInference)
         #plot_ADVI_posterior(NNInput, ADVIApprox)
         ADVITrace = ADVIApprox.sample(draws=NNInput.NTraceADVI)
         #PathToModTrace = NNInput.PathToOutputFldr + '/Model&Trace.pkl'
@@ -265,7 +258,7 @@ def sgd_optimization(NNInput):
     x.tag.test_value = numpy.random.randint(100,size=(100,3))
     n.tag.test_value = 100
     #_sample_proba = ADVIApprox.sample_node(yLike.distribution.mean, size=n, more_replacements={xSetTrainTemp : x})
-    _sample_proba = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrainTemp : x})
+    _sample_proba = ADVIApprox.sample_node(yPred, size=n, more_replacements={RSetTrain: x})
     sample_proba  = theano.function([x, n], _sample_proba)
 
     i=-1

@@ -231,22 +231,33 @@ def sgd_optimization(NNInput):
     Valid                 = []
     ValidEpochVec         = []
     iTry                  = 0
+
+    TrainErorrVec = []
+    iMiniBatch    = 0 
+    if (NNInput.Model=='ModPIP') or (NNInput.Model == 'ModPIPPol'):
+        xSetTrain = RSetTrain
+        xSetValid = RSetValid
+        xSetTest  = RSetTest
+        xDataOrig = RDataOrig
+    elif (NNInput.Model == 'PIP'):
+        xSetTrain = GSetTrain
+        xSetValid = GSetValid
+        xSetTest  = GSetTest
+        #xDataOrig = GDataOrig
+    # print(xSetTrain)
+    # print(xSetValid)
+    # print(xSetTest)
+    # print(xDataOrig)
+    # print(ySetTrain.get_value())
+    # print(ySetValid.get_value())
+    # print(ySetTest.get_value())
+    # print(yDataOrig)
+    # time.sleep(5)
+
+
     while (iEpoch < NNInput.NEpoch) and (LoopingFlg):
         iEpoch += 1
 
-
-        TrainErorrVec = []
-        iMiniBatch    = 0 
-        if (NNInput.Model=='ModPIP') or (NNInput.Model == 'ModPIPPol'):
-            xSetTrain = RSetTrain
-            xSetValid = RSetValid
-            xSetTest  = RSetTest
-            xDataOrig = RDataOrig
-        elif (NNInput.Model == 'PIP'):
-            xSetTrain = GSetTrain
-            xSetValid = GSetValid
-            xSetTest  = GSetTest
-            #xDataOrig = GDataOrig
         for TrainBatch in iterate_minibatches(xSetTrain, ySetTrain, NNInput.NMiniBatch, shuffle=True):
             TrainInputs, TrainTargets = TrainBatch
             iMiniBatch += 1

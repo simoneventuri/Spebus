@@ -25,8 +25,8 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
                 PathToFldr = NNInput.PathToWeightFldr + NNInput.LayersName[iLayer] + '/'
                 LambdaIni, reIni = load_parameters_PIP(PathToFldr)
 
-            WIni  = [ load_parameters(NNInput.PathToWeightFldr + NNInput.LayersName[iLayer] + '/')[0] for iLayer in range(2,len(NNInput.LayersName))]
-            bIni  = [ load_parameters(NNInput.PathToWeightFldr + NNInput.LayersName[iLayer] + '/')[1] for iLayer in range(2,len(NNInput.LayersName))]
+            WIni  = [ load_parameters(NNInput.PathToWeightFldr + NNInput.LayersName[iLayer] + '/')[0] for iLayer in range(3,len(NNInput.LayersName))]
+            bIni  = [ load_parameters(NNInput.PathToWeightFldr + NNInput.LayersName[iLayer] + '/')[1] for iLayer in range(3,len(NNInput.LayersName))]
             W1Ini = WIni[0]
             b1Ini = bIni[0]
             W2Ini = WIni[1]
@@ -106,7 +106,7 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
             # LambdaPar = pymc3.Normal('Lambda',     mu=LambdaMean, sd=LambdaSD, shape=(1,1), testval=LambdaIni)
             # rePar     = pymc3.Normal('re',         mu=reMean,     sd=reSD,     shape=(1,1), testval=reIni)
             LambdaPar = pymc3.Uniform('Lambda', lower=0.0, upper=2.0, shape=(1,1), testval=1.0)
-            rePar     = pymc3.Uniform('re',     lower=0.0, upper=1.5, shape=(1,1), testval=0.1)
+            rePar     = pymc3.Uniform('re',     lower=0.0, upper=1.5, shape=(1,1), testval=1.0)
 
             p0 = pymc3.math.exp( - LambdaPar * (R[:,0] - rePar))
             p1 = pymc3.math.exp( - LambdaPar * (R[:,1] - rePar))
@@ -189,10 +189,10 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
 
 
         # Define likelihood
-        yNorm = yPred #/ T.abs_(y)**NNInput.OutputExpon
-        yObs  =     y #/ T.abs_(y)**NNInput.OutputExpon
+        yNorm = yPred + 0.0 #/ T.abs_(y)**NNInput.OutputExpon
+        yObs  =     y + 0.0 #/ T.abs_(y)**NNInput.OutputExpon
         Sigma = pymc3.Lognormal('Sigma', mu=0.01,  sd=2.0,   testval=10.0)
-        yLike = pymc3.Normal('yLike',    mu=yNorm, sd=Sigma, observed=yObs, total_size=NNInput.NTrain)
+        yLike = pymc3.Normal('yLike',    mu=yNorm, sd=Sigma, observed=yObs, total_size=NNInput.NBatchTrain)
         
         # Inference!
         #trace  = pymc3.sample(3000) # , cores=2 draw 3000 posterior samples using NUTS sampling
@@ -200,13 +200,12 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
         ADVIInference = 0
         ADVITracker   = 0 
         #ADVIApprox    = 0
-        ADVIInference = pymc3.ADVI()
+        #ADVIInference = pymc3.ADVI()
         ADVITracker   = pymc3.callbacks.Tracker(mean=ADVIInference.approx.mean.eval, std=ADVIInference.approx.std.eval)
-        ##ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker])
         ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
 
         SVGDApprox = 0
-        #SVGDApprox = pymc3.fit(300, method='svgd', inf_kwargs=dict(n_particles=100), obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-6))
+        #SVGDApprox = pymc3.fit(300, method='svgd', inf_kwargs=dict(n_particles=1000), obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
         #ADVIApprox = SVGDApprox 
 
         NUTSTrace = 0
@@ -214,7 +213,10 @@ def construct_model(NNInput, R, y, G_MEAN, G_SD):
         #NUTSTrace = pymc3.sample(2000, step, start=approx.sample()[0], progressbar=True, njobs=1)
         #NUTSTrace = pymc3.sample(2000, tune=1000, njobs=2, start=approx.sample()[0], progressbar=True)
 
-        return ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yLike, yPred
+
+        #MCMCTrace = pymc3.sample(200000, step=pymc3.Metropolis(), tune=10000)
+
+        return ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, MCMCTrace, model, yLike, yPred
 
 
 def try_model_PIP(NNInput, R, LambdaVec, reVec, WIni, bIni, G_MEAN, G_SD):

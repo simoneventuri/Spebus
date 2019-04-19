@@ -5,6 +5,7 @@ import numpy
 import theano
 import math
 import theano.tensor as T
+import time
 
 from NNInput         import NNInput
 from SaveData        import save_labels
@@ -51,9 +52,9 @@ def load_data(NNInput):
         PathToTryLabels         = NNInput.PathToDataFldr + '/E.csv.' + str(int(numpy.floor(Ang)))
         yPrint                  = load_labels(PathToTryLabels)
         yPrintDiat, dyPrintDiat = V_Diat_MAT_print(NNInput, RPrint)
-        yPrintTriat             = yPrint - yPrintDiat
+        yPrintTriat             = yPrint + 0.0#- yPrintDiat
         yPrint                  = Transformation(NNInput, yPrint, yPrintTriat)
-        
+
         SetPrint                                = (RPrint, yPrint, yPrintDiat, yPrintTriat)
         RPrint, yPrint, yPrintDiat, yPrintTriat = shared_dataset(SetPrint)
         rPrint                                  = (RPrint, yPrint, yPrintDiat, yPrintTriat)
@@ -118,7 +119,7 @@ def load_data(NNInput):
     PathToLabels                  = NNInput.PathToDataFldr + '/EOrig.csv'
     yDataOrig                     = load_labels(PathToLabels)
     yDataDiatOrig, dyDataDiatOrig = V_Diat_MAT(NNInput, RDataOrig)
-    yDataTriatOrig                = yDataOrig - yDataDiatOrig
+    yDataTriatOrig                = yDataOrig + 0.0 #- yDataDiatOrig
     if (NNInput.AddDiatPointsFlg):
         yDiatDiat, dyDiatDiat = V_Diat_MAT(NNInput, RDataDiat)
         yDiat                 = yDiatDiat + 1.e-10
@@ -132,7 +133,6 @@ def load_data(NNInput):
         yDataTriat = yDataTriatOrig + 0.0
     yData  = Transformation(NNInput, yData, yDataTriat)
 
-
     if (NNInput.RandomizeDataFlg):
         # Shuffle the training set
         order     = numpy.argsort(numpy.random.random(NTrain))
@@ -140,10 +140,10 @@ def load_data(NNInput):
             RData[:,iR] = RData[order,iR]
         yData = yData[order]
 
-    RSetTrain      = (RData[0:NTrain+1,:])
-    ySetTrain      = (yData[0:NTrain+1])
-    ySetTrainDiat  = (yDataDiat[0:NTrain+1])
-    ySetTrainTriat = (yDataTriat[0:NTrain+1])
+    RSetTrain      = (RData[0:-1,:])
+    ySetTrain      = (yData[0:-1])
+    ySetTrainDiat  = (yDataDiat[0:-1])
+    ySetTrainTriat = (yDataTriat[0:-1])
 
 
     SetTrain = (RSetTrain, ySetTrain, ySetTrainDiat, ySetTrainTriat)

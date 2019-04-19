@@ -8,6 +8,7 @@ import theano.tensor as T
 
 from NNInput     import NNInput
 
+
 def Transformation(NNInput, yData, yDataTriat):
 
     if (NNInput.OnlyTriatFlg):

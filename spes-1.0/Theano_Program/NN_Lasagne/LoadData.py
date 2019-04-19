@@ -5,6 +5,7 @@ import numpy
 import theano
 import math
 import theano.tensor as T
+import time
 
 from DiatPot         import V_Diat_MAT, V_Diat_MAT_print
 from NNInput         import NNInput
@@ -63,37 +64,6 @@ def load_data(NNInput):
         RPrint, GPrint, yPrint, yPrintDiat, yPrintTriat = shared_dataset(SetPrint)
         rPrint                                          = (RPrint, GPrint, yPrint, yPrintDiat, yPrintTriat)
         return rPrint
-
-
-    # def generate_fake_data(PathToGenedWeightsFldr, PathToGenedLabels, NLayers, NTot, ActFun):
-
-    #     print(('    Generating Weights and Labels\n'))
-
-    #     NIn        = NLayers[0]
-    #     NOut       = NLayers[-1]
-    #     WAll       = []
-    #     WValuesAll = []
-    #     bAll       = []
-    #     bValuesAll = []
-    #     for i in range(len(NLayers)-2):
-    #         WValues    = numpy.asarray(rng.uniform(low=-10.0, high=10.0, size=(NLayers[i], NLayers[i+1]), dtype=theano.config.floatX))
-    #         WValuesAll = WValuesAll.append(WValues)
-    #         W          = theano.shared(value=WValues, name='W', borrow=True)    
-    #         WAll       = [WAll, W]
-
-    #         bValues    = numpy.asarray(rng.uniform(low=-10.0, high=10.0, size=(NLayers[i+1],), dtype=theano.config.floatX))
-    #         bValuesAll = bValuesAll.append(bValues)
-    #         b          = theano.shared(value=bValues, name='b', borrow=True)
-    #         bAll       = [bAll, b]
-
-    #     save_labels(PathToGenedWeightsFldr, 'Generated', WValuesAll, bValuesAll)
-
-    #     yData = []
-    #     for i in range(NTot):
-    #         yData.append( fwd(train_x, NLayers, ActFun, WAll, bAll) )
-        
-    #     save_labels(PathToGenedLabels, 'Generated', yData)
-    #     return yData
 
 
     ##################################################################################################################################
@@ -162,7 +132,6 @@ def load_data(NNInput):
         yDataTriat = yDataTriatOrig + 0.0
     yData = Transformation(NNInput, yData, yDataTriat)
 
-
     if (NNInput.RandomizeDataFlg):
         # Shuffle the training set
         order = numpy.argsort(numpy.random.random(NTot))
@@ -179,10 +148,10 @@ def load_data(NNInput):
         G_SD   = GData.std(axis=0)
         print('    Scale Values: Mean=', G_MEAN, '; StDev=', G_SD, '\n')
     else:
-        G_MEAN = numpy.array([0.0, 0.0, 0.0])
-        G_SD   = numpy.array([1.0, 1.0, 1.0]) 
-        #G_MEAN = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        #G_SD   = numpy.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) 
+        #G_MEAN = numpy.array([0.0, 0.0, 0.0])
+        #G_SD   = numpy.array([1.0, 1.0, 1.0]) 
+        G_MEAN = numpy.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+        G_SD   = numpy.array([1.0, 1.0, 1.0, 1.0, 1.0, 1.0]) 
     PathToScalingValues = NNInput.PathToOutputFldr + '/ScalingValues.csv'
     save_scales(PathToScalingValues, G_MEAN, G_SD)
     GData = (GData - G_MEAN) / G_SD

@@ -93,8 +93,8 @@ class NNInput(object):
     MultErrorFlg           = True
     AddDiatPointsFlg       = False
 
-    AngVector              = [60,110,116.75,170]
-    #AngVector              = [60]
+    #AngVector              = [60,110,116.75,170]
+    AngVector              = [60]
     #AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
     #RCuts                  = numpy.array([2.26767, 2.26767, 2.64562, 2.28203327])
     AnglesCuts             = numpy.array([120.0])

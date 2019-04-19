@@ -28,8 +28,8 @@ def PIP_A3(NNInput, R, LambdaVec, reVec):
     G1 = p0*p1*p2
     G2 = p0**2*p1    + p0*p1**2    + p2**2*p1    + p2*p1**2    + p0**2*p2    + p0*p2**2
     G3 = p0**3*p1    + p0*p1**3    + p2**3*p1    + p2*p1**3    + p0**3*p2    + p0*p2**3
-    G4 = p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0 + p2*p1**2*p0 + p0**2*p2*p1 + p0*p2**2*p1
-    G5 = p0**2*p1**2 + p0**2*p1**2 + p2**2*p1**2 + p2**2*p1**2 + p0**2*p2**2 + p0**2*p2**2
+    G4 = p0**2*p1*p2 + p0*p1**2*p2 + p2**2*p1*p0
+    G5 = p0**2*p1**2 + p2**2*p1**2 + p0**2*p2**2
 
     #G  = numpy.column_stack([G0,G1,G2])
     G  = numpy.column_stack([G0,G1,G2,G3,G4,G5])
@@ -78,11 +78,12 @@ class PIP_A3_Layer(lasagne.layers.Layer):
         G4 =   p0**2*p1*p2 + p0*p1**2*p2 + p0*p1*p2**2
         G5 =   p0**2*p1**2 + p2**2*p1**2 + p0**2*p2**2
 
-        G  = T.concatenate([[G0],[G1],[G2]], axis=0)
-        #G  = T.concatenate([[G0],[G1],[G2],[G3],[G4],[G5]], axis=0)
+        #G  = T.concatenate([[G0],[G1],[G2]], axis=0)
+        G  = T.concatenate([[G0],[G1],[G2],[G3],[G4],[G5]], axis=0)
         G  = T.squeeze(G).T
 
         return G 
 
     def get_output_shape_for(self, input_shape):
-        return (input_shape[0], 3)
+        #return (input_shape[0], 3)
+        return (input_shape[0], 6)

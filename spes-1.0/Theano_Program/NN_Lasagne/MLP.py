@@ -126,7 +126,7 @@ def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
         if (NNInput.Model=='ModPIP') or (NNInput.Model=='PIP'):
 
             iLayer = iLayer+1
-            Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
+            #Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
             #W1 = lasagne.init.Uniform(range=Range)
             W1 = lasagne.init.GlorotNormal(gain=1.0)
             if (NNInput.BiasesFlg):
@@ -135,7 +135,7 @@ def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
                 b1 = None
             iLayer = iLayer+1
 
-            Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
+            #Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
             #W2 = lasagne.init.Uniform(range=Range)
             W2 = lasagne.init.GlorotNormal(gain=1.0)
             if (NNInput.BiasesFlg):
@@ -144,7 +144,7 @@ def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
                 b2 = None
             iLayer = iLayer+1
 
-            Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
+            #Range = numpy.sqrt(6.0/(NNInput.NLayers[iLayer]+NNInput.NLayers[iLayer+1]))
             #W3 = lasagne.init.Uniform(range=Range)
             W3 = lasagne.init.GlorotNormal(gain=1.0)
             if (NNInput.BiasesFlg):
