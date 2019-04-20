@@ -120,14 +120,14 @@ def sgd_optimization(NNInput):
     # time.sleep(5)
     if (NNInput.TrainFlg):
         if (NNInput.NMiniBatch > 0):
-            RSetTrainTemp  = pymc3.Minibatch(RSetTrain.get_value(), batch_size=NNInput.NMiniBatch)
-            ySetTrainTemp  = pymc3.Minibatch(ySetTrain.get_value(), batch_size=NNInput.NMiniBatch)
+            RSetTrainTemp  = pymc3.Minibatch(RSetTrain.get_value(), batch_size=NNInput.NMiniBatch, dtype='float64')
+            ySetTrainTemp  = pymc3.Minibatch(ySetTrain.get_value(), batch_size=NNInput.NMiniBatch, dtype='float64')
         else:
             RSetTrainTemp      = RSetTrain
             ySetTrainTemp      = ySetTrain
             NNInput.NMiniBatch = NNInput.NTrain
         #ADVIApprox, ADVIInference, ADVITracker, SVGDApprox, NUTSTrace, model, yPred, Sigma, Layers = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
-        ADVIApprox, ADVIInference, SVGDApprox, NUTSTrace, Params, yPred = construct_model(NNInput, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
+        ADVIApprox, ADVIInference, SVGDApprox, NUTSTrace, Params, yPred = construct_model(NNInput, RSetTrain, ySetTrain, RSetTrainTemp, ySetTrainTemp, GaussWeightsW, GaussWeightsb)
         #
         plot_ADVI_ELBO(NNInput, ADVIInference)
         #
@@ -271,7 +271,7 @@ def sgd_optimization(NNInput):
     m                       = T.iscalar('m')
     _sample_proba_SigmaPred = ADVIApprox.sample_node(Params.get('Sigma'), size=n*m)
     sample_proba_SigmaPred  = theano.function([n,m], _sample_proba_SigmaPred)
-    SigmaPred               = sample_proba_SigmaPred(NNInput.NParPostSamples, NSigmaSamples)
+    SigmaPred               = sample_proba_SigmaPred(NNInput.NOutPostSamples, NSigmaSamples)
     SigmaPred               = numpy.reshape(SigmaPred, (NNInput.NOutPostSamples, NSigmaSamples))
 
     i=-1
@@ -279,7 +279,6 @@ def sgd_optimization(NNInput):
         numpy.random.seed(RandomSeed)
         pymc3.set_tt_rng(RandomSeed)
         i=i+1 
-
         RSetPlot, ySetPlot, ySetPlotDiat, ySetPlotTriat = datasetsPlot[i]
         ySetPlot     = T.cast(ySetPlot, 'float64')
         ySetPlot     = ySetPlot.eval()
@@ -287,21 +286,12 @@ def sgd_optimization(NNInput):
         yPredPlot   = sample_proba_yPred(RSetPlot.get_value(borrow=True), NNInput.NOutPostSamples)
         yPredSum    = ySetPlot * 0.0
         yPredSumSqr = ySetPlot * 0.0
-        yPostSum    = ySetPlot * 0.0
-        yPostSumSqr = ySetPlot * 0.0
         for j in range(NNInput.NOutPostSamples):
             yPredTemp   = numpy.array(yPredPlot[j,:])
-            if (NNInput.AddNoiseToPredsFlg):
-                for k in range(NSigmaSamples):
-                    SigmaTemp   = SigmaPred[j,k]
-                    yPostTemp   = yPredTemp + numpy.random.normal(loc=0.0, scale=SigmaTemp)
-                    yPostTemp   = InverseTransformation(NNInput, yPostTemp, ySetPlotDiat.get_value()) 
-                    yPostSum    = yPostSum    + yPostTemp
-                    yPostSumSqr = yPostSumSqr + numpy.square(yPostTemp) 
             yPredTemp   = InverseTransformation(NNInput, yPredTemp, ySetPlotDiat.get_value()) 
             yPredSum    = yPredSum    + yPredTemp
             yPredSumSqr = yPredSumSqr + numpy.square(yPredTemp)
-        
+        #
         yMean       = yPredSum / NNInput.NOutPostSamples
         yStD        = numpy.sqrt(yPredSumSqr / NNInput.NOutPostSamples - numpy.square(yMean))
         yPlus       = yMean + SigmaIntCoeff * yStD
@@ -310,7 +300,31 @@ def sgd_optimization(NNInput):
         save_moments(PathToPlotLabels, 'yPred', numpy.column_stack([RSetPlot.get_value(), ySetPlot, yMean, yStD, yMinus, yPlus]))
         print('    Wrote Sampled yPred for Angle ', Ang, '\n')
 
-        if (NNInput.AddNoiseToPredsFlg):
+
+    if (NNInput.AddNoiseToPredsFlg):
+        i=-1
+        for Ang in NNInput.AngVector:
+            numpy.random.seed(RandomSeed)
+            pymc3.set_tt_rng(RandomSeed)
+            i=i+1 
+            RSetPlot, ySetPlot, ySetPlotDiat, ySetPlotTriat = datasetsPlot[i]
+            ySetPlot     = T.cast(ySetPlot, 'float64')
+            ySetPlot     = ySetPlot.eval()
+            #ySetPlot     = InverseTransformation(NNInput, ySetPlot, ySetPlotDiat.get_value())
+            yPredPlot   = sample_proba_yPred(RSetPlot.get_value(borrow=True), NNInput.NOutPostSamples)
+            yPostSum    = ySetPlot * 0.0
+            yPostSumSqr = ySetPlot * 0.0
+            for j in range(NNInput.NOutPostSamples):
+                yPredTemp   = numpy.array(yPredPlot[j,:])
+                if (NNInput.AddNoiseToPredsFlg):
+                    for k in range(NSigmaSamples):
+                        SigmaTemp   = SigmaPred[j,k]
+                        RandNum     = numpy.random.normal(loc=0.0, scale=SigmaTemp)
+                        yPostTemp   = yPredTemp + RandNum
+                        yPostTemp   = InverseTransformation(NNInput, yPostTemp, ySetPlotDiat.get_value()) 
+                        yPostSum    = yPostSum    + yPostTemp
+                        yPostSumSqr = yPostSumSqr + numpy.square(yPostTemp) 
+            #
             yMean       = yPostSum / NNInput.NOutPostSamples
             yStD        = numpy.sqrt(yPostSumSqr / NNInput.NOutPostSamples - numpy.square(yMean))
             yPlus       = yMean + SigmaIntCoeff * yStD

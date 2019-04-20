@@ -15,18 +15,20 @@ class NNInput(object):
     Machine = 'MAC'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
-        NStepsADVI             = 3000
+        NStepsADVI             = 100000
         NTraceADVI             = 1000
         NParPostSamples        = 100
         NOutPostSamples        = 100
         PlotShow               = True
+        AddNoiseToPredsFlg     = False
     elif (Machine == 'ENTROPY'):
         PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
         NStepsADVI             = 3000000
-        NTraceADVI             = 1000
-        NParPostSamples        = 300
+        NTraceADVI             = 0
+        NParPostSamples        = 500
         NOutPostSamples        = 1000
         PlotShow               = False
+        AddNoiseToPredsFlg     = True
 
     # System                 = 'N3'
     # iPES                   = '1'
@@ -34,12 +36,18 @@ class NNInput(object):
     # DiatPot_FunPrint       = V_N2_LeRoy
     # PreLogShift            = 1.0
     # PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat_David/PES_' + iPES + '/'
+    # AngVector              = [60.0,120.0,180.0] #[60]
+    # AnglesCuts             = numpy.array([120.0])
+    # RCuts                  = numpy.array([2.073808])
     System                 = 'O3'
     iPES                   = '1'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
     PreLogShift            = -3.0
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
+    AngVector              = [60.0,110.0,116.75,170.0] #[60]
+    AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
+    RCuts                  = numpy.array([2.26767, 2.26767, 2.64562, 2.28203327])
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
@@ -82,31 +90,22 @@ class NNInput(object):
         PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/LEPS_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
         PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/LEPS_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
 
-    GenDataFlg             = False
-    NIn                    = 3
-    NOut                   = 1
+    NMiniBatch             = 100
     RandomizeDataFlg       = True
     NormalizedDataFlg      = False
-
-    NMiniBatch             = 0
-    AddNoiseToPredsFlg     = True
-    
-    OutputExpon            = 0.0
-    Power                  = 5.0
-    Shift                  = 7.27216
-
     OnlyTriatFlg           = False
     MultErrorFlg           = True
-    AddDiatPointsFlg       = False
 
-    AngVector              = [60,110,116.75,170]
-    #AngVector              = [60]
-    #AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
-    #RCuts                  = numpy.array([2.26767, 2.26767, 2.64562, 2.28203327])
-    AnglesCuts             = numpy.array([120.0])
-    RCuts                  = numpy.array([2.073808])
+    NIn                    = 3
+    NOut                   = 1
 
     AbscissaConverter      = 1.0
+    AddDiatPointsFlg       = False
+
+    GenDataFlg             = 0#False
+    OutputExpon            = 0#0.0
+    Power                  = 0#5.0
+    Shift                  = 0#7.27216
 
     if (System == 'O3') or (System == 'N3'):
         PIPTypeStr = 'PIP_A3'

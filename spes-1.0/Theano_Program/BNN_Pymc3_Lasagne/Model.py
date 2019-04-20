@@ -16,7 +16,7 @@ from Plot     import plot_ADVI_convergence
 import PIP      
 import BondOrder 
 
-def construct_model(NNInput, Input, yObs, InitW, Initb):
+def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
 
     with pymc3.Model() as model:
 
@@ -57,7 +57,6 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         W3      = pymc3.Normal('W3', mu=0.0, sd=W3Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
         b3      = pymc3.Normal('b3', mu=0.0, sd=10.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
 
-        Params  = {'Lambda':Lambda,'re':re, 'W1':W1,'b1':b1, 'W2':W2,'b2':b2, 'W3':W3,'b3':b3, 'Sigma':Sigma}
 
         iLayer=0;        InputL     = lasagne.layers.InputLayer((None, NNInput.NLayers[iLayer]),  input_var=Input,                                     name=NNInput.LayersName[iLayer])
         iLayer=iLayer+1; BOL        =           BondOrder_Layer(InputL, Lambda=Lambda, re=re,                                                          name=NNInput.LayersName[iLayer])   
@@ -74,13 +73,17 @@ def construct_model(NNInput, Input, yObs, InitW, Initb):
         yLike = pymc3.Normal('yLike',     mu=yPred, sd=Sigma, observed=numpy.log(yObs), total_size=NNInput.NMiniBatch)
         
 
+        Params  = {'Lambda':Lambda,'re':re, 'W1':W1,'b1':b1, 'W2':W2,'b2':b2, 'W3':W3,'b3':b3, 'Sigma':Sigma}
+
+
         # Inference!
         #ADVIInference = 0
         #ADVITracker   = 0 
         #ADVIApprox    = 0
         ADVIInference = pymc3.ADVI()
         ADVITracker   = pymc3.callbacks.Tracker(mean=ADVIInference.approx.mean.eval, std=ADVIInference.approx.std.eval)
-        ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
+        #ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
+        ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, more_replacements={RSetTrain: Input, ySetTrain: yObs}, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker])
         #ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference)
         plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
 
