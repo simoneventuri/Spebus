@@ -15,7 +15,7 @@ class NNInput(object):
     Machine = 'MAC'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
-        NStepsADVI             = 100000
+        NStepsADVI             = 500000
         NTraceADVI             = 1000
         NParPostSamples        = 100
         NOutPostSamples        = 100
@@ -28,7 +28,7 @@ class NNInput(object):
         NParPostSamples        = 500
         NOutPostSamples        = 1000
         PlotShow               = False
-        AddNoiseToPredsFlg     = True
+        AddNoiseToPredsFlg     = False
 
     # System                 = 'N3'
     # iPES                   = '1'
@@ -90,7 +90,7 @@ class NNInput(object):
         PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/LEPS_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
         PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/LEPS_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
 
-    NMiniBatch             = 100
+    NMiniBatch             = 0
     RandomizeDataFlg       = True
     NormalizedDataFlg      = False
     OnlyTriatFlg           = False

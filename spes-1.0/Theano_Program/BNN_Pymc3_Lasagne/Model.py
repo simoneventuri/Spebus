@@ -70,7 +70,7 @@ def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
         # Define likelihood
         #Sigma = pymc3.Lognormal('Sigma', mu=0.01,  sd=2.0, testval=10.0)
         Sigma = pymc3.HalfNormal('Sigma', sd=1.0, testval=1.0)
-        yLike = pymc3.Normal('yLike',     mu=yPred, sd=Sigma, observed=numpy.log(yObs), total_size=NNInput.NMiniBatch)
+        yLike = pymc3.Normal('yLike',     mu=yPred, sd=Sigma, observed=numpy.log(yObs))#, total_size=NNInput.NMiniBatch
         
 
         Params  = {'Lambda':Lambda,'re':re, 'W1':W1,'b1':b1, 'W2':W2,'b2':b2, 'W3':W3,'b3':b3, 'Sigma':Sigma}
@@ -82,8 +82,10 @@ def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
         #ADVIApprox    = 0
         ADVIInference = pymc3.ADVI()
         ADVITracker   = pymc3.callbacks.Tracker(mean=ADVIInference.approx.mean.eval, std=ADVIInference.approx.std.eval)
-        #ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
-        ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, more_replacements={RSetTrain: Input, ySetTrain: yObs}, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker])
+        if (NNInput.NMiniBatch == 0):
+            ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker], obj_optimizer=pymc3.adadelta(learning_rate=1.0, rho=0.95, epsilon=1e-8))
+        else:
+            ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, more_replacements={RSetTrain: Input, ySetTrain: yObs}, method=ADVIInference, callbacks=[pymc3.callbacks.CheckParametersConvergence(diff='absolute'), ADVITracker])
         #ADVIApprox    = pymc3.fit(n=NNInput.NStepsADVI, method=ADVIInference)
         plot_ADVI_convergence(NNInput, ADVITracker, ADVIInference)
 
