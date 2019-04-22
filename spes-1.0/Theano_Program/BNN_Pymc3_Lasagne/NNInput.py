@@ -23,10 +23,10 @@ class NNInput(object):
         AddNoiseToPredsFlg     = False
     elif (Machine == 'ENTROPY'):
         PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
-        NStepsADVI             = 3000000
+        NStepsADVI             = 5000000
         NTraceADVI             = 0
         NParPostSamples        = 500
-        NOutPostSamples        = 1000
+        NOutPostSamples        = 3000
         PlotShow               = False
         AddNoiseToPredsFlg     = False
 

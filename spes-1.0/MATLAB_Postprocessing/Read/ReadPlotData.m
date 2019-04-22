@@ -1,9 +1,9 @@
 function [RPlot, EPlot] = ReadPlotData()
 
-  global RFile alphaVec AbscissaConverter
+  global RFile alphaPlot AbscissaConverter
   
   
-  filename = strcat(RFile,'/RE.csv.',num2str(alphaVec(1)));
+  filename = strcat(RFile,'/RE.csv.',num2str(floor(alphaPlot(1))));
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%f%f%[^\n\r]';
@@ -17,15 +17,15 @@ function [RPlot, EPlot] = ReadPlotData()
   clearvars filename delimiter startRow formatSpec fileID dataArray ans;
   R = [R1,R2,R3] .* AbscissaConverter;
   
-  RPlot = zeros(size(R,1),size(R,2),size(alphaVec,1));
-  EPlot = zeros(size(R,1),size(alphaVec,1));
+  RPlot = zeros(size(R,1),size(R,2),length(alphaPlot));
+  EPlot = zeros(size(R,1),length(alphaPlot));
   RPlot(:,:,1) = R;
   EPlot(:,1)   = E;
   
   jAng = 1;
-  for iAng = alphaVec(2:end)
-
-    filename = strcat(RFile,'/RE.csv.',num2str(iAng));
+  for iAng = alphaPlot(2:end)
+    
+    filename = strcat(RFile,'/RE.csv.',num2str(floor(iAng)));
     delimiter = ',';
     startRow = 2;
     formatSpec = '%f%f%f%f%[^\n\r]';
@@ -39,8 +39,8 @@ function [RPlot, EPlot] = ReadPlotData()
     clearvars filename delimiter startRow formatSpec fileID dataArray ans;
     R = [R1,R2,R3] .* AbscissaConverter;
     
-    RPlot(:,:,iAng) = R;
-    EPlot(:,iAng)   = E;
+    RPlot(:,:,jAng) = R;
+    EPlot(:,jAng)   = E;
     
     jAng = jAng + 1;
   end

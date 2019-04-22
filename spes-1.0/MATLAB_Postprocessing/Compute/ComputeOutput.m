@@ -22,14 +22,14 @@ function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2
     y2     = tanh(z2);
     EPred  = y2 * W3 + b3Mat;
     
-    if (Sigma > 0.0)
-      EPredSum = EPred.*0.0;
-      for iSigma = 1:NSigma
-        EPred    = EPred + normrnd(0.0,Sigma);
-        EPredSum = EPredSum + EPred;
-      end
-      EPred = EPredSum ./ NSigma;
-    end
+%     if (Sigma > 0.0)
+%       EPredSum = EPred.*0.0;
+%       for iSigma = 1:NSigma
+%         EPred    = EPred + normrnd(0.0,Sigma);
+%         EPredSum = EPredSum + EPred;
+%       end
+%       EPred = EPredSum ./ NSigma;
+%     end
     
   elseif strcmp(NetworkType,'Pol')
     

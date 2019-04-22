@@ -1,6 +1,6 @@
 function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDataPred, EDataMean, EDataSD)
 
-  global OnlyTriatFlg System RMin
+  global OnlyTriatFlg System RMin NSigmaInt
     
   if strcmp(System,'N3')
     [FittedShift, dE1] = N2_LeRoy(RMin);
@@ -32,7 +32,7 @@ function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDa
 %     scatter(EDataRep(:,i),EDataPred(:,i),'k','filled');
 %     hold on
 %   end
-  errorbar(EData,EDataMean,3.0.*EDataSD,'o','MarkerSize',6,'MarkerEdgeColor','red','MarkerFaceColor','red') 
+  errorbar(EData,EDataMean,NSigmaInt.*EDataSD,'o','MarkerSize',6,'MarkerEdgeColor','red','MarkerFaceColor','red') 
   %scatter(EData,EDataMean,20,'r','filled') 
   plot([0.0, 80.0],[0.0, 80.0],'-')
   iFigure = iFigure+1

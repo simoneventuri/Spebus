@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import numpy
 import theano
 import theano.tensor as T
