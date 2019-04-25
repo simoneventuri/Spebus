@@ -12,10 +12,10 @@ class NNInput(object):
     ReadIniParamsFlg = False
     SaveInference    = False
 
-    Machine = 'MAC'
+    Machine = 'ENTROPY'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
-        NStepsADVI             = 500000
+        NStepsADVI             = 5000
         NTraceADVI             = 1000
         NParPostSamples        = 100
         NOutPostSamples        = 100
@@ -23,7 +23,7 @@ class NNInput(object):
         AddNoiseToPredsFlg     = False
     elif (Machine == 'ENTROPY'):
         PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
-        NStepsADVI             = 5000000
+        NStepsADVI             = 10000000
         NTraceADVI             = 0
         NParPostSamples        = 500
         NOutPostSamples        = 3000
@@ -60,7 +60,7 @@ class NNInput(object):
         LambdaVec              = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         reVec                  = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_'  + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Stoch_'  + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat_2Levels/' + System + '_' + iPES + '/'
         PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
