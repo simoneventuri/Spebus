@@ -5,7 +5,8 @@ clc
 
 global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples iFigure RFile SaveSampledOutputFlg ...
        alphaVec RCutsVec NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun NetworkType NOrd System ...
-       DataShift AbscissaConverter MomentaFileName NN_Folder ComputeCut NSigma NSigmaInt alphaPlot NPlots TestFileName
+       DataShift AbscissaConverter MomentaFileName NN_Folder ComputeCut NSigma NSigmaInt alphaPlot NPlots TestFileName DiatMin CheckPostVec ...
+       ShiftScatter
 
 AbscissaConverter    = 1.0;%0.529177
      
@@ -20,17 +21,19 @@ NetworkType          = 'NN'
   NOrd               = 10
   
 iFigure              = 1;
-SaveSampledOutputFlg = true
 
-UseSamplesFlg        = false
+UseSamplesFlg        = 1
 StartSample          = 1
-FinalSample          = 10
+FinalSample          = 300
 NSamples             = FinalSample-StartSample+1;
 NSigma               = 1  
 SaveSampledOutputFlg = false
 ComputeCut           = false
 
-NSigmaInt            = 5.0
+%CheckPostVec         = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+CheckPostVec         = [100]
+
+NSigmaInt            = 3.0
 
 if strcmp(System,'N3')
   RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/N3/Triat_David/PES_1/'
@@ -39,20 +42,23 @@ if strcmp(System,'N3')
   alphaVec             = [60.0, 120.0, 180.0]
   RCutsVec             = [2.26767] * AbscissaConverter
   RMin                 = 2.073808
-  DataShift         = 0.0;
+  DataShift            = 0.0;
   EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 30.0];
   PreLogShift          = 1.0
+  ShiftScatter         = 0.0
 elseif strcmp(System,'O3')
-  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_ENTROPY/ModPIP_Stoch_10_10_Triat/O3_9/'
+  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_1/'
+  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_ENTROPY/ModPIP_Stoch_10_10_Triat/O3_1/'
   alphaPlot            = [60,110,116.75,170]
   alphaVec             = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
   RMin                 = 2.2820248
-  DataShift            = 5.303339519764099%26.3*0.04336411530877
-  EGroupsVec           = [4.336, 8.673, 21.68, 43.364, 100.0];
-  %EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0];
+  DataShift            = 5.303339519764099 %26.3*0.04336411530877
+  ShiftScatter         = 26.3*0.04336411530877
+  %EGroupsVec           = [4.336, 8.673, 21.68, 43.364, 100.0];
+  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0];
   PreLogShift          = -3.0
+  OutputFolder         = '/Users/sventuri/WORKSPACE/CG-QCT/cg-qct/dtb/O3/PESs/BNN/PES1_AbInitio_10_10/CalibratedParams/'
 end
 
 RStart               = 1.5
@@ -60,6 +66,13 @@ REnd                 = 10.0
 NPoints              = 150
 
   
+if strcmp(System,'N3')
+  [DiatMin, dE1] = N2_LeRoy(RMin);
+  %[DiatMin, dE1] = N2_MRCI(RMin)
+elseif strcmp(System,'O3')
+  [DiatMin, dE1] = O2_UMN(RMin);
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOADING DATA
 [NData, RData, EData, EFitted]        = ReadData();
@@ -69,21 +82,22 @@ RRData                                = sqrt(RData(:,1).^2+RData(:,2).^2+RData(:
 EAsymp                                = EData(Idx);             
 
 NPlots = length(alphaPlot);
-[RPlot, EDataPlot]                    = ReadPlotData();
+[RPlot, EDataPlot]             = ReadPlotData();
 for iPlot=1:NPlots
-  RTemp                        = RPlot(:,:,iPlot);
+  RTemp                        = squeeze(RPlot(iPlot,:,:));
   [EPlotDiat]                  = ComputeDiat(RTemp);
-  EDataPlot(:,iPlot)           = EDataPlot(:,iPlot) + EPlotDiat;
+  EDataPlot(iPlot,:)           = EDataPlot(iPlot,:) + EPlotDiat';
   clear RTemp EPlotDiat
 end
 
 NCuts  = length(RCutsVec)
 NPtCut = 1000;
-[RCut, ECut, NPoitsVec, RCutPred]     = ReadCutData(NPtCut);
+[RCut, ECut, EFittedCut, NPoitsVec, RCutPred] = ReadCutData(NPtCut);
 for iCut=1:NCuts
-  RTemp                        = RCut(1:NPoitsVec(iCut),iCut);
-  [ECutDiat]                   = ComputeDiat([RTemp,RTemp.*0.0+100.0,RTemp.*0.0+100.0,]);
-  ECut(1:NPoitsVec(iCut),iCut) = ECut(1:NPoitsVec(iCut),iCut) + ECutDiat;
+  RTemp                        = squeeze(RCut(iCut,1:NPoitsVec(iCut),1:3));
+  [ECutDiat]                   = ComputeDiat(RTemp);
+  ECut(iCut,1:NPoitsVec(iCut))       = ECut(iCut,1:NPoitsVec(iCut))       + ECutDiat';
+  EFittedCut(iCut,1:NPoitsVec(iCut)) = EFittedCut(iCut,1:NPoitsVec(iCut)) + ECutDiat';
   clear RTemp ECutDiat
 end
 
@@ -93,8 +107,11 @@ end
 G_MEAN=0.0;G_SD=0.0;
 
 %% LOADING PARAMETER'S POSTERIOR DISTRIBUTIONS
-if (UseSamplesFlg == false)
+if (UseSamplesFlg < 2)
   [Lambda_MEAN, re_MEAN, W1_MEAN, W2_MEAN, W3_MEAN, b1_MEAN, b2_MEAN, b3_MEAN, Sigma_MEAN, Lambda_SD, re_SD, W1_SD, W2_SD, W3_SD, b1_SD, b2_SD, b3_SD, Sigma_SD] = ReadParametersStats();
+  
+  NSamplesLHS  = FinalSample-StartSample+1;
+  [LHSSamples, Lambda_LHS, re_LHS, W1_LHS, W2_LHS, W3_LHS, b1_LHS, b2_LHS, b3_LHS, Sigma_LHS] = ComputeLHS(NSamplesLHS, Lambda_MEAN, re_MEAN, W1_MEAN, W2_MEAN, W3_MEAN, b1_MEAN, b2_MEAN, b3_MEAN, Sigma_MEAN, Lambda_SD, re_SD, W1_SD, W2_SD, W3_SD, b1_SD, b2_SD, b3_SD, Sigma_SD);
 end
 
 
@@ -107,71 +124,93 @@ b1_Hist     = [];
 b2_Hist     = [];
 b3_Hist     = [];
 Sigma_Hist  = [];
-%EDataPred  = zeros(size(RData,1),NSamples);
-EDataSum   = zeros(size(RData,1),1);
-EDataSqSum = zeros(size(RData,1),1);
-%EPlot      = zeros(size(RPlot,1),NPlots,NSamples);
-EPlotSum   = zeros(size(RPlot,1),NPlots);
-EPlotSqSum = zeros(size(RPlot,1),NPlots);
+EDataPred  = zeros(NSamples,size(RData,1));
+EDataSum   = zeros(1,size(RData,1));
+EDataSqSum = zeros(1,size(RData,1));
+%EPlot      = zeros(NSamples,NPlots,size(RPlot,1));
+EPlotSum   = zeros(NPlots,size(RPlot,2));
+EPlotSqSum = zeros(NPlots,size(RPlot,2));
 %ECut       = zeros(NPtCut,NCuts,NSamples);
-ECutSum    = zeros(NPtCut,NCuts);
-ECutSqSum  = zeros(NPtCut,NCuts);
-for iSample = StartSample:FinalSample
+ECutSum    = zeros(NCuts,NPtCut);
+ECutSqSum  = zeros(NCuts,NPtCut);
+iSample    = StartSample;
+while iSample <= FinalSample
   
-  % OBTAINING PARAMETERS
-  if (UseSamplesFlg)
+  %% OBTAINING PARAMETERS
+  if (UseSamplesFlg == 2)
     [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist] = ReadParametersSamples(iSample, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist);
-  else
+  elseif (UseSamplesFlg == 1)
+    Lambda = ones(3,1) .* Lambda_LHS(iSample);
+    re     = ones(3,1) .* re_LHS(iSample);
+    W1     = squeeze(W1_LHS(iSample,:,:));
+    W2     = squeeze(W2_LHS(iSample,:,:));
+    W3     = W3_LHS(iSample,:)';
+    b1     = b1_LHS(iSample,:)';
+    b2     = b2_LHS(iSample,:)';
+    b3     = b3_LHS(iSample);
+    Sigma  = Sigma_LHS(iSample);
+    Noise  = normrnd(0.0, Sigma);
+    WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
+  elseif (UseSamplesFlg == 0)
     [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma] = ComputeParametersSamples(Lambda_MEAN, Lambda_SD, re_MEAN, re_SD, W1_MEAN, W1_SD, W2_MEAN, W2_SD, W3_MEAN, W3_SD, b1_MEAN, b1_SD, b2_MEAN, b2_SD, b3_MEAN, b3_SD, Sigma_MEAN, Sigma_SD);
+    Noise = normrnd(0.0, Sigma);
+    WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
   end
   
-  % COMPUTING OUTPUT @ TRAINING DATA
-  RMinVec              = [RMin, 50.0, 50.0];
-  [PredShift]          = ComputeOutput(RMinVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, 0.0);
+  %% CHECKING DERIVATIVES
+  % AngVecCheckDer = [60.0,110,116.75,170];
+  % ComputePESDerivatives(AngVecCheckDer, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0)
+  
+  %% ADDING SHIFTS
+  % RMaxVec      = [100.0, 100.0, 100.0];
+  % [PredAsympt] = ComputeOutput(RMaxVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, 0.0);
+  % PredAsympt   = 0.0;
+  
+  %% COMPUTING OUTPUT @ TRAINING DATA
   [EPred]              = ComputeOutput(RData, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
-  %EDataPred(:,iSample) = EPred;
+  EDataPred(iSample,:) = EPred;
   EDataSum(:)          = EDataSum(:)   + EPred;
   EDataSqSum(:)        = EDataSqSum(:) + EPred.^2;
   
-  % COMPUTING OUTPUT @ PLOTTING DATA
-  RMaxVec              = [50.0, 50.0, 50.0];
-  [PredShift]          = ComputeOutput(RMaxVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, 0.0);
-  for iPlot=1:NPlots
-    [EPred]                = ComputeOutput(RPlot(:,:,iPlot), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma) - DataShift;
-    %EPlot(:,iPlot,iSample) = EPred;
-    EPlotSum(:,iPlot)      = EPlotSum(:,iPlot)   + EPred;
-    EPlotSqSum(:,iPlot)    = EPlotSqSum(:,iPlot) + EPred.^2;
-    clear EPred
-  end
-  
-  % COMPUTING OUTPUT @ CUT DATA
-  for iCut=1:NCuts
-    [EPred]                  = ComputeOutput(RCutPred(:,:,iCut), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
-    %ECutPred(:,iCut,iSample) = EPred;
-    ECutSum(:,iCut)          = ECutSum(:,iCut)   + EPred;
-    ECutSqSum(:,iCut)        = ECutSqSum(:,iCut) + EPred.^2;
-    clear EPred
-  end
-  
+%   %% COMPUTING OUTPUT @ 3D VIEWS DATA
+%   for iPlot=1:NPlots
+%     [EPred]                = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
+%     %EPlot(iSample,iPlot,:) = EPred;
+%     EPlotSum(iPlot,:)      = EPlotSum(iPlot,:)   + EPred';
+%     EPlotSqSum(iPlot,:)    = EPlotSqSum(iPlot,:) + EPred'.^2;
+%     clear EPred
+%   end
+%   
+%   %% COMPUTING OUTPUT @ CUT DATA
+%   for iCut=1:NCuts
+%     [EPred]                  = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
+%     %ECutPred(iSample,iCut,:) = EPred;
+%     ECutSum(iCut,:)          = ECutSum(iCut,:)   + EPred';
+%     ECutSqSum(iCut,:)        = ECutSqSum(iCut,:) + EPred'.^2;
+%     clear EPred
+%   end
+
+  iSample = iSample+1;
 end
-EDataMean =      EDataSum   ./ NSamples;
-EDataSD   = sqrt(EDataSqSum ./ NSamples - (EDataMean).^2 );
+iSample   = iSample - StartSample;
+EDataMean =      EDataSum   ./ iSample;
+EDataSD   = sqrt(EDataSqSum ./ iSample - (EDataMean).^2 );
 for iPlot=1:NPlots
-  EPlotMean(:,iPlot) =      EPlotSum(:,iPlot)   ./ NSamples;
-  EPlotSD(:,iPlot)   = sqrt(EPlotSqSum(:,iPlot) ./ NSamples - (EPlotMean(:,iPlot)).^2 );
+  EPlotMean(iPlot,:) =      EPlotSum(iPlot,:)   ./ iSample;
+  EPlotSD(iPlot,:)   = sqrt(EPlotSqSum(iPlot,:) ./ iSample - (EPlotMean(iPlot,:)).^2 );
 end
 for iCut=1:NCuts
-  ECutMean(:,iCut)  =      ECutSum(:,iCut)   ./ NSamples;
-  ECutSD(:,iCut)    = sqrt(ECutSqSum(:,iCut) ./ NSamples - (ECutMean(:,iCut)).^2 );
+  ECutMean(iCut,:)  =      ECutSum(iCut,:)   ./ iSample;
+  ECutSD(iCut,:)    = sqrt(ECutSqSum(iCut,:) ./ iSample - (ECutMean(iCut,:)).^2 );
 end 
 
-%% PLOTTING DATA
-EDataPred = 0.0;
+%% PLOTTING SCATTERS & COMPUTING ERROR
+EDataPredTemp = 0.0;
 [iFigure] = PlotScatterStoch(iFigure, RData, EData, EDataDiat, EFitted, EDataPred, EDataMean, EDataSD);
 
-%% PLOT PLOT
+%% WRITING 3D VIEWS
 WriteOutputStats(RPlot, EDataPlot, EPlotMean, EPlotSD);
 
-%% PLOT CUT
+%% PLOTTING CUTS
 ECutPred  = 0.0;
-[iFigure] = PlotCutsStoch(iFigure, RCut, ECut, NPoitsVec, RCutPred, ECutPred, ECutMean, ECutSD);
+[iFigure] = PlotCutsStoch(iFigure, RCut, ECut, EFittedCut, NPoitsVec, RCutPred, ECutPred, ECutMean, ECutSD);

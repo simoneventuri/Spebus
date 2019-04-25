@@ -38,9 +38,9 @@ if strcmp(System,'N3')
   EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 30.0];
   PreLogShift          = 1.0
 elseif strcmp(System,'O3')
-  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'
+  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_1/'
   TestFileName         = 'RE.csv.60'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_10_10_Triat/O3_9/'
+  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_10_10_Triat/O3_1/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIPPol_Determ_10_Triat/O3_1'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
@@ -66,8 +66,13 @@ NPoints              = 150
 
 %% LOADING PIP'S PARAMETERS
 [G_MEAN, G_SD] = ReadScales();
+
 %% LOADING NN's PARAMETERS
 [Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det] = ReadParametersDeterm();
+
+%% CHECKING DERIVATIVES
+% AngVec = [60.0,110,116.75,170];
+% ComputePESDerivatives(AngVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0)
 
 %% PLOT CUTS
 % [iFigure] = PlotCuts(iFigure, G_MEAN, G_SD, Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det)
@@ -82,7 +87,6 @@ PlotDiatomicPot(100, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b
 for iAng=alphaVec
   iAng
   ComputeOutputAtPlot(iAng, RLambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
-                      (iAng, R, E, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma)
 end
 
 

@@ -2,8 +2,9 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   
   global NHL Network_Folder
   
+  FolderName = 'StochPESParams';%'ParamsPosts';
   
-  filename = strcat(Network_Folder,'/ParamsPosts/Lambda.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/Lambda.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -13,7 +14,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   clearvars filename delimiter formatSpec fileID dataArray ans;
   Lambda = ones(3,1).*LambdaTemp;
   
-  filename = strcat(Network_Folder,'/ParamsPosts/re.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/re.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -24,7 +25,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   re = ones(3,1).*reTemp;
   
   
-  filename = strcat(Network_Folder,'/ParamsPosts/b1.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/b1.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -33,7 +34,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   b1 = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
-  filename = strcat(Network_Folder,'/ParamsPosts/W1.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/W1.csv.',num2str(iSample));
   delimiter = ',';
   formatSpec = '';
   for i = 1:NHL(2)
@@ -47,7 +48,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
 
-  filename = strcat(Network_Folder,'/ParamsPosts/b2.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/b2.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -56,7 +57,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   b2 = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
-  filename = strcat(Network_Folder,'/ParamsPosts/W2.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/W2.csv.',num2str(iSample));
   delimiter = ',';
   formatSpec = '';
   for i = 1:NHL(3)
@@ -70,7 +71,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
 
-  filename = strcat(Network_Folder,'/ParamsPosts/b3.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/b3.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -79,7 +80,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   b3 = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
-  filename = strcat(Network_Folder,'/ParamsPosts/W3.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/W3.csv.',num2str(iSample));
   delimiter = ',';
   formatSpec = '';
   for i = 1:NHL(4)
@@ -93,7 +94,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   clearvars filename delimiter formatSpec fileID dataArray ans;
 
 
-  filename = strcat(Network_Folder,'/ParamsPosts/Sigma.csv.',num2str(iSample));
+  filename = strcat(Network_Folder,'/',FolderName,'/Sigma.csv.',num2str(iSample));
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');

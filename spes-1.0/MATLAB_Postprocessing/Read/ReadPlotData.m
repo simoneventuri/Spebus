@@ -1,6 +1,6 @@
 function [RPlot, EPlot] = ReadPlotData()
 
-  global RFile alphaPlot AbscissaConverter
+  global RFile alphaPlot AbscissaConverter DiatMin
   
   
   filename = strcat(RFile,'/RE.csv.',num2str(floor(alphaPlot(1))));
@@ -17,12 +17,12 @@ function [RPlot, EPlot] = ReadPlotData()
   clearvars filename delimiter startRow formatSpec fileID dataArray ans;
   R = [R1,R2,R3] .* AbscissaConverter;
   
-  RPlot = zeros(size(R,1),size(R,2),length(alphaPlot));
-  EPlot = zeros(size(R,1),length(alphaPlot));
-  RPlot(:,:,1) = R;
-  EPlot(:,1)   = E;
+  RPlot = zeros(length(alphaPlot),size(R,1),size(R,2));
+  EPlot = zeros(length(alphaPlot),size(R,1));
+  RPlot(1,:,:) = R;
+  EPlot(1,:)   = E - DiatMin;
   
-  jAng = 1;
+  jAng = 2;
   for iAng = alphaPlot(2:end)
     
     filename = strcat(RFile,'/RE.csv.',num2str(floor(iAng)));
@@ -39,8 +39,8 @@ function [RPlot, EPlot] = ReadPlotData()
     clearvars filename delimiter startRow formatSpec fileID dataArray ans;
     R = [R1,R2,R3] .* AbscissaConverter;
     
-    RPlot(:,:,jAng) = R;
-    EPlot(:,jAng)   = E;
+    RPlot(jAng,:,:) = R;
+    EPlot(jAng,:)   = E - DiatMin;
     
     jAng = jAng + 1;
   end

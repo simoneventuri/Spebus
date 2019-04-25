@@ -82,7 +82,7 @@ function [NData, RData, EData, EFitted] = ReadData()
     catch me
     end
   end
-  EData = cell2mat(raw(:, 1)) - DataShift;
+  EData = cell2mat(raw(:, 1));
   clearvars filename delimiter startRow formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
  
   NData =size(EData,1);
@@ -115,7 +115,7 @@ function [NData, RData, EData, EFitted] = ReadData()
       EDiat  = ComputeDiat([R1,R2,R3]);
       E      = EDiat + ETriat;
       
-      DeltaMaxAng = 0.1;
+      DeltaMaxAng = 0.05;
       if     ((Ang1 <= iAng + DeltaMaxAng) && (Ang1 >= iAng - DeltaMaxAng))
         fprintf(fileID,'%f,%f,%f,%f,%f,%f\n', R2,R1,R3,EDiat,ETriat,E);
         fprintf(fileID,'%f,%f,%f,%f,%f,%f\n', R3,R1,R2,EDiat,ETriat,E);
