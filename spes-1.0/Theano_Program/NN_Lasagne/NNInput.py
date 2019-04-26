@@ -27,7 +27,7 @@ class NNInput(object):
     iPES                   = '1'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
-    PreLogShift            = -3.0
+    PreLogShift            = -3.5
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
 
     Model                  = 'ModPIP'
@@ -35,7 +35,7 @@ class NNInput(object):
     if (Model=='ModPIP'):
         LayersName             = ['InputLayer',              'BondOrderLayer',                    'PIPLayer',              'HiddenLayer1',              'HiddenLayer2',                 'OutputLayer']
         ActFun                 = [              lasagne.nonlinearities.linear, lasagne.nonlinearities.linear, lasagne.nonlinearities.tanh, lasagne.nonlinearities.tanh, lasagne.nonlinearities.linear]
-        NHid                   = [                                          3,                             6,                          10,                           10                              ]
+        NHid                   = [                                          3,                             6,                          10,                          10                               ]
         NLayers                = []
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
@@ -71,8 +71,8 @@ class NNInput(object):
     NormalizeDataFlg       = False
     CheckpointPath         = PathToOutputFldr + '/training_1/cp.ckpt'    
 
-    NEpoch                 = 30000
-    NMiniBatch             = 20
+    NEpoch                 = 50000
+    NMiniBatch             = 100
     NIterMax               = 10000000000
     NPatience              = 1000000   
     NDeltaPatience         = 2        
@@ -85,7 +85,7 @@ class NNInput(object):
     RMSProp                = [0.85, 0.1]
     kWeightDecay           = [1.e-100, 1.e-100]
 
-    LossFunction           = 'normalized_squared_error' # squared_error, normalized_squared_error, huber_loss, weighted_squared_error
+    LossFunction           = 'squared_error' # squared_error, normalized_squared_error, huber_loss, weighted_squared_error
     OutputExpon            = 0.0
     Power                  = 5.0
     Shift                  = 7.27216

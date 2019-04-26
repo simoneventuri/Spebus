@@ -22,7 +22,12 @@ def save_ADVI_reconstruction_PIP(NNInput, PathToADVI, ADVIApprox, Params):
     n.tag.test_value = 100
     NParamsStats     = 3000#NNInput.NParPostSamples
 
-    for var in ['Lambda', 're', 'W1', 'W2', 'W3', 'b1', 'b2', 'b3', 'Sigma']:
+    if (NNInput.TwoLevelsFlg):
+        VarVec = ['Lambda', 're', 'W1Hyper', 'W1', 'W2Hyper', 'W2', 'W3Hyper', 'W3', 'b1', 'b2', 'b3', 'Sigma']
+    else:
+        VarVec = ['Lambda', 're', 'W1', 'W2', 'W3', 'b1', 'b2', 'b3', 'Sigma']
+
+    for var in VarVec:
         #
         _sample_proba = ADVIApprox.sample_node(Params.get(var), size=n)
         sample_proba  = theano.function([n], _sample_proba)
@@ -48,7 +53,12 @@ def save_ADVI_sample_PIP(NNInput, PathToADVI, ADVIApprox, Params):
     n.tag.test_value = 100
     NPSamples        = NNInput.NParPostSamples
 
-    for var in ['Lambda', 're', 'W1', 'W2', 'W3', 'b1', 'b2', 'b3', 'Sigma']:
+    if (NNInput.TwoLevelsFlg):
+        VarVec = ['Lambda', 're', 'W1Hyper', 'W1', 'W2Hyper', 'W2', 'W3Hyper', 'W3', 'b1', 'b2', 'b3', 'Sigma']
+    else:
+        VarVec = ['Lambda', 're', 'W1', 'W2', 'W3', 'b1', 'b2', 'b3', 'Sigma']
+
+    for var in VarVec:
         #
         _sample_proba = ADVIApprox.sample_node(Params.get(var), size=n)
         sample_proba  = theano.function([n], _sample_proba)

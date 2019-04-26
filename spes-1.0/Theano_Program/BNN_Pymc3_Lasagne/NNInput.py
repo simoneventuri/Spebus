@@ -15,15 +15,15 @@ class NNInput(object):
     Machine = 'MAC'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
-        NStepsADVI             = 500000
+        NStepsADVI             = 500
         NTraceADVI             = 1000
         NParPostSamples        = 100
         NOutPostSamples        = 100
-        PlotShow               = True
+        PlotShow               = False
         AddNoiseToPredsFlg     = False
     elif (Machine == 'ENTROPY'):
         PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
-        NStepsADVI             = 5000000
+        NStepsADVI             = 10000000
         NTraceADVI             = 0
         NParPostSamples        = 500
         NOutPostSamples        = 3000
@@ -40,10 +40,10 @@ class NNInput(object):
     # AnglesCuts             = numpy.array([120.0])
     # RCuts                  = numpy.array([2.073808])
     System                 = 'O3'
-    iPES                   = '1'
+    iPES                   = '9'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
-    PreLogShift            = -3.0
+    PreLogShift            = -3.5
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
     AngVector              = [60.0,110.0,116.75,170.0] #[60]
     AnglesCuts             = numpy.array([110.0,     170.0,    60.0,     116.75])
@@ -51,7 +51,7 @@ class NNInput(object):
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
-    TwoLevelsFlg           = False
+    TwoLevelsFlg           = True
     if (Model=='ModPIP'):
         LayersName             = ['InputLayer',              'BondOrderLayer',                    'PIPLayer',              'HiddenLayer1',              'HiddenLayer2',                 'OutputLayer']
         ActFun                 = [              lasagne.nonlinearities.linear, lasagne.nonlinearities.linear, lasagne.nonlinearities.tanh, lasagne.nonlinearities.tanh, lasagne.nonlinearities.linear]

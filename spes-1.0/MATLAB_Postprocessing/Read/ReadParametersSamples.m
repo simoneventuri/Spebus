@@ -2,7 +2,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   
   global NHL Network_Folder
   
-  FolderName = 'StochPESParams';%'ParamsPosts';
+  FolderName = 'ParamsPosts';%'StochPESParams';
   
   filename = strcat(Network_Folder,'/',FolderName,'/Lambda.csv.',num2str(iSample));
   delimiter = '';
@@ -104,16 +104,16 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hi
   clearvars filename delimiter formatSpec fileID dataArray ans;
   
   
-  Lambda_Hist(:,iSample) = Lambda;
-  re_Hist(:,iSample)     = re;
+  Lambda_Hist(iSample,:) = Lambda;
+  re_Hist(iSample,:)     = re;
   
-  W1_Hist(:,:,iSample) = W1;
-  W2_Hist(:,:,iSample) = W2;
-  W3_Hist(:,:,iSample) = W3;
+  W1_Hist(iSample,:,:) = W1;
+  W2_Hist(iSample,:,:) = W2;
+  W3_Hist(iSample,:,:) = W3;
   
-  b1_Hist(:,iSample)   = b1;
-  b2_Hist(:,iSample)   = b2;
-  b3_Hist(:,iSample)   = b3;
+  b1_Hist(iSample,:)   = b1;
+  b2_Hist(iSample,:)   = b2;
+  b3_Hist(iSample,:)   = b3;
   
   Sigma_Hist(iSample)  = Sigma;
   

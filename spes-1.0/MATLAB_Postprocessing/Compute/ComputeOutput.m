@@ -22,6 +22,8 @@ function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2
     y2     = tanh(z2);
     EPred  = y2 * W3 + b3Mat;
     
+    %EPred  = EPred + Sigma;%normrnd(0.0,Sigma);
+    
 %     if (Sigma > 0.0)
 %       EPredSum = EPred.*0.0;
 %       for iSigma = 1:NSigma
@@ -80,7 +82,7 @@ function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2
   end 
     
   if (MultErrorFlg) 
-    EPred = exp(EPred);
+    %EPred = exp(EPred);
     EPred = EPred - PreLogShift;
   end
   if (OnlyTriatFlg)

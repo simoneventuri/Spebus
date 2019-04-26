@@ -1,4 +1,4 @@
-function PlotDiatomicPot(iFigure, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3)
+function PlotDiatomicPot(iFigure, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma)
 
   global MultErrorFlg OnlyTriatFlg PreLogShift System AbscissaConverter
   
@@ -7,9 +7,9 @@ function PlotDiatomicPot(iFigure, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, 
   R3    = R1.*0.d0+100.0;
   RTest = [R1,R2,R3];
   
-  [EPred]        = ComputeOutput(RTest, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3);
+  [EPred]        = ComputeOutput(RTest, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
   RTest          = [1.d2,1.d2,1.d2];
-  [EPredInf]     = ComputeOutput(RTest, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3);
+  [EPredInf]     = ComputeOutput(RTest, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
   if strcmp(System,'N3')
     [EData, dE]    = N2_LeRoy(R1'./AbscissaConverter);
     [EDataInf, te] = N2_LeRoy(1.d2');

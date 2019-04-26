@@ -316,10 +316,10 @@ def sgd_optimization(NNInput):
                 yPredTemp   = numpy.array(yPredPlot[j,:])
                 if (NNInput.AddNoiseToPredsFlg):
                     for k in range(NSigmaSamples):
+                        yPostTemp   = InverseTransformation(NNInput, yPostTemp, ySetPlotDiat.get_value()) 
                         SigmaTemp   = SigmaPred[j,k]
                         RandNum     = numpy.random.normal(loc=0.0, scale=SigmaTemp)
-                        yPostTemp   = yPredTemp + RandNum
-                        yPostTemp   = InverseTransformation(NNInput, yPostTemp, ySetPlotDiat.get_value()) 
+                        yPostTemp   = yPredTemp * RandNum
                         yPostSum    = yPostSum    + yPostTemp
                         yPostSumSqr = yPostSumSqr + numpy.square(yPostTemp) 
             #
