@@ -101,7 +101,7 @@ for PES_NAME = PES_NAMES
   % iEq
   % pause
 
-  for iAng=[60,110,116.75,170]
+  for iAng=[[35:5:175],[106.75:10:126.75]]
     File   = strcat('./PES_',num2str(iPES),'/REData.csv.', num2str(floor(iAng)));
     fileID = fopen(File,'w');
     fprintf(fileID,'R1,R2,R3,ETriat,E,ENew\n')

@@ -13,12 +13,12 @@ PathToCGQCT     = '/Users/sventuri/WORKSPACE/CG-QCT/'
 WriteDataFldr        = strcat(PathToSPES, '/Temp/');
 [status, msg, msgID] = mkdir(WriteDataFldr)
 
-PESs = 9;
+PESs = 1;
 for iPES = 1:PESs
   iPES
 
   %ReadDataFldr         = strcat(PathToCGQCT,'/run_N3_NASA/Test/PlotPES/PES_',num2str(iPES),'/')
-  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_ALL/Test/PlotPES/PES_',num2str(iPES),'/')
+  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_PES9/Test/PlotPES/PES_',num2str(iPES),'/')
   WriteDataFldr        = strcat(PathToSPES, '/Temp/PES_', num2str(iPES), '/')
   [status, msg, msgID] = mkdir(WriteDataFldr)
 
@@ -56,7 +56,7 @@ for iPES = 1:PESs
   
 
   %Angles = [60, 80, 100, 120, 140, 160, 180];
-  Angles = [60, 80, 100, 110, 116.75, 140, 160, 170, 180];
+  Angles = [[35:5:175],[106.75:10:126.75]];
   for iAngle = Angles
 
     filename = strcat(ReadDataFldr, '/PESFromGrid.csv.', num2str(floor(iAngle)))
