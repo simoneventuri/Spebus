@@ -54,8 +54,8 @@ def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
             W3Hyper = pymc3.HalfNormal('W3Hyper', sd=2.0, testval=1.0)
         else:
             W3Hyper = 5.0
-        W3      = pymc3.Normal('W3', mu=0.0, sd=W3Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
-        b3      = pymc3.Normal('b3', mu=0.0, sd=10.0,    testval=10.0, shape=NNInput.NLayers[iLayer+1])
+        W3      = pymc3.Normal('W3', mu=0.0, sd=W3Hyper,  testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
+        b3      = pymc3.HalfNormal('b3', mu=0.0, sd=10.0, testval=10.0, shape=NNInput.NLayers[iLayer+1])
 
 
         iLayer=0;        InputL     = lasagne.layers.InputLayer((None, NNInput.NLayers[iLayer]),  input_var=Input,                                     name=NNInput.LayersName[iLayer])

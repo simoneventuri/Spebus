@@ -24,10 +24,10 @@ class NNInput(object):
     # PreLogShift            = 1.0
     # PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat_David/PES_' + iPES + '/'
     System                 = 'O3'
-    iPES                   = '1'
+    iPES                   = '9'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
-    PreLogShift            = -3.5
+    PreLogShift            = 1.0
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
 
     Model                  = 'ModPIP'
@@ -40,8 +40,8 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
-        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat_FAKE/' + System + '_' + iPES + '/'
+        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat_FAKE/' + System + '_' + iPES + '/'
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -71,8 +71,8 @@ class NNInput(object):
     NormalizeDataFlg       = False
     CheckpointPath         = PathToOutputFldr + '/training_1/cp.ckpt'    
 
-    NEpoch                 = 50000
-    NMiniBatch             = 100
+    NEpoch                 = 100000
+    NMiniBatch             = 30
     NIterMax               = 10000000000
     NPatience              = 1000000   
     NDeltaPatience         = 2        

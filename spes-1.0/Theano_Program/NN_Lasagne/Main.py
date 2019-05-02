@@ -147,8 +147,6 @@ def sgd_optimization(NNInput):
     InputVar  = T.dmatrix('Inputs')
     #InputVar.tag.test_value  = numpy.random.randint(100,size=(100,3))
     InputVar.tag.test_value  = numpy.array([[1.0,2.0,7.0],[3.0,5.0,11.0]]) * 0.529177
-    Shift     = T.dscalar('Shift')
-    Shift.tag.test_value  = 0.0
     TargetVar = T.dmatrix('Targets')
     #TargetVar.tag.test_value = numpy.random.randint(100,size=(100,1))
 
@@ -159,8 +157,8 @@ def sgd_optimization(NNInput):
     if (NNInput.LossFunction == 'squared_error'):
         #TrainError       = T.abs_( ( TrainPrediction - TargetVar ) )
         #TrainLoss        = lasagne.objectives.squared_error( TrainPrediction, TargetVar )
-        TrainError       = T.abs_( ( T.log(TrainPrediction + Shift) - T.log(TargetVar + Shift) ) )
-        TrainLoss        = lasagne.objectives.squared_error( T.log(TrainPrediction + Shift), T.log(TargetVar + Shift) )
+        TrainError       = T.abs_( ( T.log(T.abs_(TrainPrediction)) - T.log(T.abs_(TargetVar)) ) )
+        TrainLoss        = lasagne.objectives.squared_error( T.log(T.abs_(TrainPrediction)), T.log(T.abs_(TargetVar)) )
     elif (NNInput.LossFunction == 'normalized_squared_error'):
         TrainError       = T.abs_( (TrainPrediction - TargetVar ) / T.abs_(TargetVar)**NNInput.OutputExpon )
         TrainLoss        = normalized_squared_error(T.log(TrainPrediction), T.log(TargetVar), NNInput.OutputExpon)
@@ -195,14 +193,14 @@ def sgd_optimization(NNInput):
         updates          = lasagne.updates.adam(TrainLoss, params, learning_rate=NNInput.LearningRate, beta1=0.9, beta2=0.999, epsilon=1e-08)
     elif (NNInput.Method == 'adadelta'):
         updates          = lasagne.updates.adadelta(TrainLoss, params, learning_rate=NNInput.LearningRate, rho=0.95, epsilon=1e-08)
-    TrainFn = theano.function(inputs=[InputVar, TargetVar, Shift], outputs=[TrainError, TrainLoss], updates=updates)
+    TrainFn = theano.function(inputs=[InputVar, TargetVar], outputs=[TrainError, TrainLoss], updates=updates)
 
 
     ValidPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
 
     if (NNInput.LossFunction == 'squared_error'):
         # ValidError      = T.sqr( ValidPrediction - TargetVar )
-        ValidError      = T.sqr( T.log(ValidPrediction + Shift) - T.log(TargetVar + Shift) )
+        ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
         ValidError      = T.sqrt(ValidError.mean())
     elif (NNInput.LossFunction == 'normalized_squared_error'):
         ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
@@ -215,7 +213,7 @@ def sgd_optimization(NNInput):
         w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
         ValidError      = w * T.sqr(ValidPrediction - TargetVar)
         ValidError      = T.sqrt(ValidError.mean())
-    ValFn   = theano.function(inputs=[InputVar, TargetVar, Shift], outputs=ValidError)
+    ValFn   = theano.function(inputs=[InputVar, TargetVar], outputs=ValidError)
 
 
     ###############
@@ -273,7 +271,7 @@ def sgd_optimization(NNInput):
             TempShift = 0.0
 
             #[ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets)
-            [ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets, TempShift)
+            [ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets)
             #TrainErorrVec = numpy.append(TrainErorrVec, ThisValidError)
 
 
@@ -283,7 +281,7 @@ def sgd_optimization(NNInput):
                 for ValidBatch in iterate_minibatches(xSetValid, ySetValid, NValid, shuffle=False):
                     ValidInputs, ValidTargets = ValidBatch
                     #ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
-                    ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets, TempShift))
+                    ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
                 ThisValidError        = numpy.mean(ValidErorrVec)
                 #ValidEpochVec = numpy.append(ValidEpochVec, iEpoch)
                 #Valid         = numpy.append(Valid,         ThisValidError)
@@ -309,7 +307,7 @@ def sgd_optimization(NNInput):
                     for TestBatch in iterate_minibatches(xSetTest, ySetTest, NTest, shuffle=False):
                         TestInputs, TestTargets = TestBatch
                         #TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets))
-                        TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets, TempShift))
+                        TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets))
                     TestScore  = numpy.mean(TestErrorVec)
 
                     print(('        iEpoch %i, minibatch %i/%i, test error of best model %f') % (iEpoch, iMiniBatch + 1, NBatchTrain, TestScore))

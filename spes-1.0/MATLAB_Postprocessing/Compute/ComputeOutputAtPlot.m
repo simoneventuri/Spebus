@@ -1,6 +1,6 @@
 function ComputeOutputAtPlot(iAng, R, EAllFitted, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma)
   
-  global RFile Network_Folder RMin System AbscissaConverter OnlyTriatFlg alphaPlot
+  global RFile Network_Folder RMin System AbscissaConverter OnlyTriatFlg alphaPlot DiatMin
 
   RMinVec     = [RMin, 50.0, 50.0];
   [PredShift] = ComputeOutput(RMinVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);

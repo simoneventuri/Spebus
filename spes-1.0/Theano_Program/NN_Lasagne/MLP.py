@@ -148,7 +148,7 @@ def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
             #W3 = lasagne.init.Uniform(range=Range)
             W3 = lasagne.init.GlorotNormal(gain=1.0)
             if (NNInput.BiasesFlg):
-                b3 = lasagne.init.Constant(10.0)
+                b3 = lasagne.init.Constant(20.0)
             else:
                 b3 = None
 

@@ -3,7 +3,7 @@ function [RPlot, EPlot] = ReadPlotData()
   global RFile alphaPlot AbscissaConverter DiatMin
   
   
-  filename = strcat(RFile,'/RE.csv.',num2str(floor(alphaPlot(1))));
+  filename = strcat(RFile,'/RE.csv.',num2str(floor(alphaPlot(1))))
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%f%f%[^\n\r]';
