@@ -96,12 +96,12 @@ NPoints  = 17;
 % scatter3(R(:,1),R(:,2),R(:,3))
 
 
-NSamples   = 5000
+NSamples   = 10000;
 RIn        = 1.5d0;
 REnd       = 10.d0;
 Samples    = lhsdesign(NSamples,3);
 RFinal     = Samples      .* (REnd-RIn)   + RIn;
-AngleFinal = Samples(:,2) .* (180.0-60.0) + 60.0;
+AngleFinal = Samples(:,2) .* (180.0-35.0) + 35.0;
 RDaje  = [];
 for i=1:NSamples
   RFinal(i,2) = sqrt(RFinal(i,1)^2 + RFinal(i,3)^2 - 2.0*RFinal(i,1)*RFinal(i,3)*cos(AngleFinal(i)/180.0*pi));
@@ -119,6 +119,10 @@ scatter3(R(:,2),R(:,1),R(:,3))
 scatter3(R(:,2),R(:,3),R(:,1))
 scatter3(R(:,3),R(:,1),R(:,2))
 scatter3(R(:,3),R(:,2),R(:,1))
+
+figure(1)
+Grp  = ones(size(R,1),1);
+gplotmatrix(R,[],Grp)
 
 NameStr = strcat('./RSampled.csv');
 csvwrite(NameStr,[RDaje(:,1),RDaje(:,2),RDaje(:,3)])

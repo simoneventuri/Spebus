@@ -6,19 +6,19 @@ clc
 global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples iFigure RFile SaveSampledOutputFlg ...
        alphaVec RCutsVec NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun NetworkType NOrd System ...
        DataShift AbscissaConverter MomentaFileName NN_Folder ComputeCut NSigma NSigmaInt alphaPlot NPlots TestFileName DiatMin CheckPostVec ...
-       ShiftScatter
-
-AbscissaConverter    = 1.0;%0.529177
+       ShiftScatter PIPFun
      
 System               = 'O3'    
  
-NHL                  = [6,10,10,1];
 MultErrorFlg         = true
 OnlyTriatFlg         = true
-  
+AbscissaConverter    = 1.0;%0.529177
+
 BondOrderFun         = 'MorseFun'
+PIPFun               = 'Simone'
 NetworkType          = 'NN'
-  NOrd               = 10
+  NHL                  = [6,10,10,1];
+  %NOrd               = 10
   
 iFigure              = 1;
 
@@ -29,10 +29,8 @@ NSamples             = FinalSample-StartSample+1;
 NSigma               = 1  
 SaveSampledOutputFlg = false
 ComputeCut           = false
-
 %CheckPostVec         = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
 CheckPostVec         = [100]
-
 NSigmaInt            = 3.0
 
 if strcmp(System,'N3')
