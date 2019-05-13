@@ -1,11 +1,11 @@
-function [iFigure] = Plotscatter_GP(iFigure, R, EData, EDiatData, EFitted, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise)
+function [iFigure] = Plotscatter_GP(iFigure, R, EData, EDiatData, EFitted, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
   
   global OnlyTriatFlg RMin EGroupsVec Network_Folder System ShiftScatter AbscissaConverter
   
   RMinVec      = [RMin, 50.0, 50.0];
-  [PredShift]  = ComputeOutput_GP(RMinVec, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, 0.0);
+  [PredShift]  = ComputeOutput_GP(RMinVec, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
   
-  [EPred]      = ComputeOutput_GP(R, Lambda, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise) - PredShift;
+  [EPred]      = ComputeOutput_GP(R, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern) - PredShift;
   
   if strcmp(System,'N3')
     [FittedShift, dE1] = N2_LeRoy(RMin);
@@ -35,7 +35,7 @@ function [iFigure] = Plotscatter_GP(iFigure, R, EData, EDiatData, EFitted, G_MEA
   scatter(EData,EFitted,'g','filled');
   hold on
   scatter(EData,EPred,'b','filled');
-  plot([0, 30.0],[0, 30.0],'-');
+  plot([0, 90.0],[0, 90.0],'-');
   iFigure = iFigure + 1;
   
   [iFigure] = ComputeError(iFigure, EData, EFitted, EPred)

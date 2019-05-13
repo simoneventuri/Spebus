@@ -6,7 +6,7 @@ clc
 
 global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples iFigure ResultsFolder RFile SaveSampledOutputFlg ...
        alphaVec RCutsVec TestFileName NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun NetworkType NOrd System ...
-       ShiftScatter AbscissaConverter alphaPlot DiatMin PIPFun
+       ShiftScatter AbscissaConverter alphaPlot DiatMin PIPFun G1Fun RPlotFile
      
 System               = 'O3'    
 AbscissaConverter    = 1.0;%0.529177
@@ -17,6 +17,7 @@ OnlyTriatFlg         = true
 BondOrderFun         = 'MorseFun'
 PIPFun               = 'Alberto'
 NetworkType          = 'GP'
+G1Fun                = 'Dif' % options are 'Old', 'New', 'Dif'
   %NOrd               = 10
   %NHL                = [6,10,10,1];
   
@@ -25,9 +26,9 @@ SaveSampledOutputFlg = true
 
 
 if strcmp(System,'N3')
-  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/N3/Triat_David/PES_1/'
+  RFile                = '/home/aracca/WORKSPACE/SPES/spes/Data_PES/O3/Analytical_9/'
   TestFileName         = 'RE.csv.120'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_10_10_Triat/N3_1/'
+  Network_Folder       = '/home/aracca/WORKSPACE/SPES/Output_DELL/GP/Par/O3_Analytical/PES_9/809_G1Old/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIPPol_Determ_13_Triat/N3_1/'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
@@ -39,14 +40,17 @@ if strcmp(System,'N3')
   EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 30.0];
   PreLogShift          = 1.0
 elseif strcmp(System,'O3')
-  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat_Fake_10000Points/PES_9/'
-  TestFileName         = 'RE.csv.60'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_10_10_Triat_FAKEFAKE/O3_9/'
+  %RFile                = '/home/aracca/WORKSPACE/SPES/spes/Data_PES/O3/Analytical_9/'
+  RFile                = '/Users/sventuri/GoogleDrive/O3_PES9/AbInitioPoints/'
+  RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
+  TestFileName         = 'RE.csv.120'
+  %Network_Folder       = '/home/aracca/WORKSPACE/SPES/Output_DELL/GP/Par/O3_Analytical/PES_9/809_G1Dif/'
+  Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/GaussianProcesses/Calibrated_AbInitio_DIF/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_ENTROPY/ModPIP_Stoch_10_10_Triat/O3_1/ParamsPosts/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIPPol_Determ_10_Triat/O3_1'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
-  alphaPlot            = [[35:5:175],[106.75:10:126.75]]
+  alphaPlot            = 60%[[35:5:175],[106.75:10:126.75]]
   alphaVec             = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
   RMin                 = 2.2820248
@@ -99,24 +103,24 @@ end
 [G_MEAN, G_SD] = ReadScales();
 
 %% LOADING GP's PARAMETERS
-[Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadParameters_GP();
+[ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern] = ReadParameters_GP()
 
 %% CHECKING DERIVATIVES
-%AngVec = [60.0,110,116.75,170];
-%ComputePESDerivatives(AngVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 1.0)
+AngVec = [60.0,110,116.75,170];
+ComputePESDerivatives_GP(AngVec, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
 
 % PLOT CUTS
-[iFigure] = PlotCuts_GP(iFigure, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise)
+[iFigure] = PlotCuts_GP(iFigure, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
 
 %% PLOT scatter PLOTS
-[iFigure] = PlotScatter_GP(iFigure, RData, EData, EDataDiat, EFitted, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise);
+[iFigure] = PlotScatter_GP(iFigure, RData, EData, EDataDiat, EFitted, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
 
 figure(100)
-PlotDiatomicPot_GP(100, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise);
+PlotDiatomicPot_GP(100, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
 
 %% ADDING DIATOMIC 
 for iPlot=1:length(alphaPlot)
-  ComputeOutputAtPlot_GP(iPlot, squeeze(RPlot(iPlot,:,:)), EDataPlot(iPlot,:), G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise);
+  ComputeOutputAtPlot_GP(iPlot, squeeze(RPlot(iPlot,:,:)), EDataPlot(iPlot,:), G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
 end
 
 

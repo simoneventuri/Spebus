@@ -3,7 +3,7 @@ function [NData, RData, EData, EFitted] = ReadData()
 
   global RFile TestFileName AbscissaConverter Network_Folder alphaPlot DataShift
   
-  filename = strcat(RFile,'/R.csv');
+  filename = strcat(RFile,'/R.csv')
   delimiter = ',';
   startRow = 2;
   formatSpec = '%s%s%s%[^\n\r]';
@@ -100,7 +100,7 @@ function [NData, RData, EData, EFitted] = ReadData()
   
   
   for iAng = alphaPlot
-    File    = strcat(Network_Folder,'/REDataPoints.csv.',num2str(floor(iAng)));
+    File    = strcat(Network_Folder,'/REDataPoints.csv.',num2str(floor(iAng)))
     fileID  = fopen(File,'w');
     fprintf(fileID,'R1,R2,R3,EDiat,ETriat,E\n');
     

@@ -12,8 +12,8 @@ function [iFigure] = PlotCutsStoch(iFigure, RCut, ECut, EFittedCut, NPoitsVec, R
       Temp2 = squeeze(ECutPred(iCut,iSample,:));
       plot(Temp1, Temp2);
     end
-    scatter(RCut(iCut,1:NPoitsVec(iCut),1),ECut(iCut,1:NPoitsVec(iCut)),'go')
-    scatter(RCut(iCut,1:NPoitsVec(iCut),1),EFittedCut(iCut,1:NPoitsVec(iCut)),'ro')
+    scatter(RCut(iCut,1:NPoitsVec(iCut),1),ECut(iCut,1:NPoitsVec(iCut)),'bo')
+    scatter(RCut(iCut,1:NPoitsVec(iCut),1),EFittedCut(iCut,1:NPoitsVec(iCut)),'go')
     iFigure = iFigure + 1;
      
   end  

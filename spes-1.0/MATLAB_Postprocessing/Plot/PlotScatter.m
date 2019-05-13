@@ -3,9 +3,9 @@ function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, Lambda, 
   global OnlyTriatFlg RMin EGroupsVec Network_Folder System ShiftScatter AbscissaConverter
   
   RMinVec      = [RMin, 50.0, 50.0];
-  [PredShift]  = ComputeOutput_GP(RMinVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
+  [PredShift]  = ComputeOutput(RMinVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma);
   
-  [EPred]      = ComputeOutput_GP(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma) - PredShift;
+  [EPred]      = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Sigma) - PredShift;
   
   if strcmp(System,'N3')
     [FittedShift, dE1] = N2_LeRoy(RMin);

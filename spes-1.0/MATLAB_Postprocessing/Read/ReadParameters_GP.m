@@ -1,10 +1,10 @@
-function [Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadParameters_GP()
+function [ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern] = ReadParameters_GP()
   
-  global NHL Network_Folder NetworkType
+  global Network_Folder
   
   PostFix = ' ';
   
-  filename = strcat(Network_Folder,'/BondOrderLayer/Lambda.csv',PostFix);
+  filename = strcat(Network_Folder,'/Parameters/ModPip.csv',PostFix);
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -12,76 +12,32 @@ function [Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadPar
   fclose(fileID);
   LambdaTemp = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
-  Lambda = LambdaTemp;
+  ModPip = LambdaTemp;
   
-  
-  filename = strcat(Network_Folder,'/PIPLayer/Exp1.csv',PostFix);
+  filename = strcat(Network_Folder,'/Parameters/Alpha.csv',PostFix);
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
   dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
   fclose(fileID);
-  Exp1Temp = dataArray{:, 1};
+  AlphaTemp = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
-  Exp1 = Exp1Temp;
-  
+  Alpha = AlphaTemp;
 
-  filename = strcat(Network_Folder,'/PIPLayer/Exp2.csv',PostFix);
-  delimiter = '';
-  formatSpec = '%f%[^\n\r]';
+  filename = strcat(Network_Folder,'/Parameters/ObsIdxPnts.csv',PostFix);
+  delimiter = ',';
+  formatSpec = '';
+  for i = 1:3
+      formatSpec = strcat(formatSpec,'%f');
+  end
+  formatSpec = strcat(formatSpec,'%[^\n\r]');
   fileID = fopen(filename,'r');
   dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
   fclose(fileID);
-  Exp2Temp = dataArray{:, 1};
-  clearvars filename delimiter formatSpec fileID dataArray ans;
-  Exp2 = Exp2Temp;
+  Obs_Idx_Pts = [dataArray{1:end-1}];
+  clearvars filename delimiter formatSpec fileID dataArray ans;  
   
-  
-  filename = strcat(Network_Folder,'/PIPLayer/Exp3.csv',PostFix);
-  delimiter = '';
-  formatSpec = '%f%[^\n\r]';
-  fileID = fopen(filename,'r');
-  dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
-  fclose(fileID);
-  Exp3Temp = dataArray{:, 1};
-  clearvars filename delimiter formatSpec fileID dataArray ans;
-  Exp3 = Exp3Temp;
-  
-  
-  filename = strcat(Network_Folder,'/PIPLayer/Exp4.csv',PostFix);
-  delimiter = '';
-  formatSpec = '%f%[^\n\r]';
-  fileID = fopen(filename,'r');
-  dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
-  fclose(fileID);
-  Exp4Temp = dataArray{:, 1};
-  clearvars filename delimiter formatSpec fileID dataArray ans;
-  Exp4 = Exp4Temp;
-  
-  
-  filename = strcat(Network_Folder,'/CalibratedParameters/l1.csv',PostFix);
-  delimiter = '';
-  formatSpec = '%f%[^\n\r]';
-  fileID = fopen(filename,'r');
-  dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
-  fclose(fileID);
-  l1Temp = dataArray{:, 1};
-  clearvars filename delimiter formatSpec fileID dataArray ans;
-  l1 = l1Temp;
-  
-  
-  filename = strcat(Network_Folder,'/CalibratedParameters/l2.csv',PostFix);
-  delimiter = '';
-  formatSpec = '%f%[^\n\r]';
-  fileID = fopen(filename,'r');
-  dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
-  fclose(fileID);
-  l2Temp = dataArray{:, 1};
-  clearvars filename delimiter formatSpec fileID dataArray ans;
-  l2 = l2Temp;
-  
-  
-  filename = strcat(Network_Folder,'/CalibratedParameters/Amp.csv',PostFix);
+  filename = strcat(Network_Folder,'/Parameters/AmpKernel.csv',PostFix);
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
@@ -91,17 +47,25 @@ function [Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadPar
   clearvars filename delimiter formatSpec fileID dataArray ans;
   Amp = AmpTemp;
   
-  
-  filename = strcat(Network_Folder,'/CalibratedParameters/SigmaNoise.csv',PostFix);
+  filename = strcat(Network_Folder,'/Parameters/LengthKernel.csv',PostFix);
   delimiter = '';
   formatSpec = '%f%[^\n\r]';
   fileID = fopen(filename,'r');
   dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
   fclose(fileID);
-  SigmaNoiseTemp = dataArray{:, 1};
+  l1Temp = dataArray{:, 1};
   clearvars filename delimiter formatSpec fileID dataArray ans;
-  SigmaNoise = SigmaNoiseTemp;
+  LKern = l1Temp;
   
+%   filename = strcat(Network_Folder,'/CalibratedParameters/SigmaNoise.csv',PostFix);
+%   delimiter = '';
+%   formatSpec = '%f%[^\n\r]';
+%   fileID = fopen(filename,'r');
+%   dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+%   fclose(fileID);
+%   SigmaNoiseTemp = dataArray{:, 1};
+%   clearvars filename delimiter formatSpec fileID dataArray ans;
+%   SigmaNoise = SigmaNoiseTemp;
   
   re = zeros(3,1);
   

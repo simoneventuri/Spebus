@@ -6,7 +6,7 @@ clc
 global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples iFigure RFile SaveSampledOutputFlg ...
        alphaVec RCutsVec NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun NetworkType NOrd System ...
        DataShift AbscissaConverter MomentaFileName NN_Folder ComputeCut NSigma NSigmaInt alphaPlot NPlots TestFileName DiatMin CheckPostVec ...
-       ShiftScatter PIPFun
+       ShiftScatter PIPFun RPlotFile
      
 System               = 'O3'    
  
@@ -22,9 +22,9 @@ NetworkType          = 'NN'
   
 iFigure              = 1;
 
-UseSamplesFlg        = 1
+UseSamplesFlg        = 2
 StartSample          = 1
-FinalSample          = 50
+FinalSample          = 300
 NSamples             = FinalSample-StartSample+1;
 NSigma               = 1  
 SaveSampledOutputFlg = false
@@ -47,6 +47,7 @@ if strcmp(System,'N3')
 elseif strcmp(System,'O3')
   RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'
   Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_ENTROPY/DAJE_ModPIP_Stoch_10_10_Triat_2Lev/O3_9/'
+  RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
   alphaPlot            = [[35:5:175],[106.75:10:126.75]]
   alphaVec             = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
@@ -84,7 +85,7 @@ NPlots = length(alphaPlot);
 for iPlot=1:NPlots
   RTemp              = squeeze(RPlot(iPlot,:,:));
   [EPlotDiat]        = ComputeDiat(RTemp);
-  EDataPlot(iPlot,:) = EDataPlot(iPlot,:) + EPlotDiat';
+  EDataPlot(iPlot,:) = EDataPlot(iPlot,:);% + EPlotDiat';
   clear RTemp EPlotDiat
 end
 
@@ -123,6 +124,7 @@ b1_Hist     = [];
 b2_Hist     = [];
 b3_Hist     = [];
 Sigma_Hist  = [];
+Noise_Hist  = [];
 EDataPred  = zeros(NSamples,size(RData,1));
 EDataSum   = zeros(1,size(RData,1));
 EDataSqSum = zeros(1,size(RData,1));
@@ -134,10 +136,12 @@ ECutSum    = zeros(NCuts,NPtCut);
 ECutSqSum  = zeros(NCuts,NPtCut);
 iSample    = StartSample;
 while iSample <= FinalSample
+  iSample
   
   %% OBTAINING PARAMETERS
   if (UseSamplesFlg == 2)
-    [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist] = ReadParametersSamples(iSample, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist);
+    [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist, Noise_Hist] = ReadParametersSamples(iSample, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist, Noise_Hist);
+    %Noise  = normrnd(0.0, Sigma);
   elseif (UseSamplesFlg == 1)
     Lambda = ones(3,1) .* Lambda_LHS(iSample);
     re     = ones(3,1) .* re_LHS(iSample);
@@ -166,12 +170,12 @@ while iSample <= FinalSample
     b3_Hist(iSample,:)   = b3;
     Sigma_Hist(iSample)  = Sigma;
     
-    Noise  = exp(normrnd(0.0, Sigma));  
+    Noise  = normrnd(0.0, Sigma);  
     %WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
   elseif (UseSamplesFlg == 0)
     [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist] = ComputeParametersSamples(iSample, Lambda_MEAN, Lambda_SD, re_MEAN, re_SD, W1_MEAN, W1_SD, W2_MEAN, W2_SD, W3_MEAN, W3_SD, b1_MEAN, b1_SD, b2_MEAN, b2_SD, b3_MEAN, b3_SD, Sigma_MEAN, Sigma_SD, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist);
     
-    Noise = exp(normrnd(0.0, Sigma));
+    Noise = normrnd(0.0, Sigma);
     %WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
   end
   
@@ -191,23 +195,23 @@ while iSample <= FinalSample
   EDataSum(:)          = EDataSum(:)   + EPred;
   EDataSqSum(:)        = EDataSqSum(:) + EPred.^2;
   
-  %% COMPUTING OUTPUT @ 3D VIEWS DATA
-  for iPlot=1:NPlots
-    [EPred]                = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
-    %EPlot(iSample,iPlot,:) = EPred;
-    EPlotSum(iPlot,:)      = EPlotSum(iPlot,:)   + EPred';
-    EPlotSqSum(iPlot,:)    = EPlotSqSum(iPlot,:) + EPred'.^2;
-    clear EPred
-  end
-  
-  %% COMPUTING OUTPUT @ CUT DATA
-  for iCut=1:NCuts
-    [EPred]                  = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
-    ECutPred(iCut,iSample,:) = EPred';
-    ECutSum(iCut,:)          = ECutSum(iCut,:)   + EPred';
-    ECutSqSum(iCut,:)        = ECutSqSum(iCut,:) + EPred'.^2;
-    clear EPred
-  end
+%   %% COMPUTING OUTPUT @ 3D VIEWS DATA
+%   for iPlot=1:NPlots
+%     [EPred]                = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+%     %EPlot(iSample,iPlot,:) = EPred;
+%     EPlotSum(iPlot,:)      = EPlotSum(iPlot,:)   + EPred';
+%     EPlotSqSum(iPlot,:)    = EPlotSqSum(iPlot,:) + EPred'.^2;
+%     clear EPred
+%   end
+%   
+%   %% COMPUTING OUTPUT @ CUT DATA
+%   for iCut=1:NCuts
+%     [EPred]                  = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+%     ECutPred(iCut,iSample,:) = EPred';
+%     ECutSum(iCut,:)          = ECutSum(iCut,:)   + EPred';
+%     ECutSqSum(iCut,:)        = ECutSqSum(iCut,:) + EPred'.^2;
+%     clear EPred
+%   end
 
   iSample = iSample+1;
 end

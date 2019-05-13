@@ -4,6 +4,9 @@ close all
 
 
 SigmaNoise = 0.1;
+%Angles = [60, 80, 100, 120, 140, 160, 180];
+%Angles = [[35:5:175],[106.75:10:126.75]];
+Angles = 35;
 
 GParams    = [1.d0];
 
@@ -18,7 +21,7 @@ for iPES = 1:PESs
   iPES
 
   %ReadDataFldr         = strcat(PathToCGQCT,'/run_N3_NASA/Test/PlotPES/PES_',num2str(iPES),'/')
-  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_PES9/Test/PlotPES/PES_',num2str(iPES),'/')
+  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_PES2/Test/PlotPES/PES_',num2str(iPES),'/')
   WriteDataFldr        = strcat(PathToSPES, '/Temp/PES_', num2str(iPES), '/')
   [status, msg, msgID] = mkdir(WriteDataFldr)
 
@@ -54,9 +57,6 @@ for iPES = 1:PESs
   fclose(fileID);
 
   
-
-  %Angles = [60, 80, 100, 120, 140, 160, 180];
-  Angles = [[35:5:175],[106.75:10:126.75]];
   for iAngle = Angles
 
     filename = strcat(ReadDataFldr, '/PESFromGrid.csv.', num2str(floor(iAngle)))

@@ -1,10 +1,10 @@
-function ComputeOutputAtPlot_GP(iAng, R, EAllFitted, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise)
+function ComputeOutputAtPlot_GP(iAng, R, EAllFitted,G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
   
   global RFile Network_Folder RMin System AbscissaConverter OnlyTriatFlg alphaPlot DiatMin
 
   RMinVec     = [RMin, 50.0, 50.0];
-  [PredShift] = ComputeOutput(RMinVec, G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise);
-  [EAllPred]  = ComputeOutput(R,       G_MEAN, G_SD, Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise);% - PredShift;
+  [PredShift] = ComputeOutput_GP(RMinVec, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
+  [EAllPred]  = ComputeOutput_GP(R      , G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);% - PredShift;
   
   filename = strcat(Network_Folder,'/RE_All.csv.',num2str(floor(alphaPlot(iAng))));
   fileID = fopen(filename,'w');

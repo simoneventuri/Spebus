@@ -1,9 +1,9 @@
 function [RPlot, EPlot] = ReadPlotData()
 
-  global RFile alphaPlot AbscissaConverter DiatMin
+  global RPlotFile alphaPlot AbscissaConverter DiatMin
   
   
-  filename = strcat(RFile,'/RE.csv.',num2str(floor(alphaPlot(1))))
+  filename = strcat(RPlotFile,'/PESFromGrid.csv.',num2str(floor(alphaPlot(1))))
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%f%f%[^\n\r]';
@@ -25,7 +25,7 @@ function [RPlot, EPlot] = ReadPlotData()
   jAng = 2;
   for iAng = alphaPlot(2:end)
     
-    filename = strcat(RFile,'/RE.csv.',num2str(floor(iAng)));
+    filename = strcat(RPlotFile,'/PESFromGrid.csv.',num2str(floor(iAng)));
     delimiter = ',';
     startRow = 2;
     formatSpec = '%f%f%f%f%[^\n\r]';

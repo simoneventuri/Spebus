@@ -4,9 +4,20 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
   
   PostFix = ' ';
   
-  if strcmp(NetworkType,'NN')
+  Folder1 = '/BondOrderLayer/';
+  Folder2 = '/HiddenLayer1/';
+  Folder3 = '/HiddenLayer2/';
+  Folder4 = '/OutputLayer/';
   
-    filename = strcat(Network_Folder,'/BondOrderLayer/Lambda.csv',PostFix);
+%   Folder1 = '/CalibratedParams/';
+%   Folder2 = '/CalibratedParams/';
+%   Folder3 = '/CalibratedParams/';
+%   Folder4 = '/CalibratedParams/';
+%   
+  if strcmp(NetworkType,'NN')
+
+    
+    filename = strcat(Network_Folder,Folder1,'/Lambda.csv',PostFix)
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -16,7 +27,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     clearvars filename delimiter formatSpec fileID dataArray ans;
     Lambda = LambdaTemp;
 
-    filename = strcat(Network_Folder,'/BondOrderLayer/re.csv',PostFix);
+    filename = strcat(Network_Folder,Folder1,'/re.csv',PostFix)
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -27,7 +38,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     re = reTemp;
 
 
-    filename = strcat(Network_Folder,'/HiddenLayer1/b.csv',PostFix);
+    filename = strcat(Network_Folder,Folder2,'/b.csv',PostFix)
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -36,7 +47,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     b1 = dataArray{:, 1};
     clearvars filename delimiter formatSpec fileID dataArray ans;
 
-    filename = strcat(Network_Folder,'/HiddenLayer1/W.csv',PostFix);
+    filename = strcat(Network_Folder,Folder2,'/W.csv',PostFix)
     delimiter = ',';
     formatSpec = '';
     for i = 1:NHL(2)
@@ -50,7 +61,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     clearvars filename delimiter formatSpec fileID dataArray ans;
 
 
-    filename = strcat(Network_Folder,'/HiddenLayer2/b.csv',PostFix);
+    filename = strcat(Network_Folder,Folder3,'/b.csv',PostFix)
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -59,7 +70,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     b2 = dataArray{:, 1};
     clearvars filename delimiter formatSpec fileID dataArray ans;
 
-    filename = strcat(Network_Folder,'/HiddenLayer2/W.csv',PostFix);
+    filename = strcat(Network_Folder,Folder3,'/W.csv',PostFix)
     delimiter = ',';
     formatSpec = '';
     for i = 1:NHL(3)
@@ -73,7 +84,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     clearvars filename delimiter formatSpec fileID dataArray ans;
 
 
-    filename = strcat(Network_Folder,'/OutputLayer/b.csv',PostFix);
+    filename = strcat(Network_Folder,Folder4,'/b.csv',PostFix)
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -82,7 +93,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     b3 = dataArray{:, 1};
     clearvars filename delimiter formatSpec fileID dataArray ans;
 
-    filename = strcat(Network_Folder,'/OutputLayer/W.csv',PostFix);
+    filename = strcat(Network_Folder,Folder4,'/W.csv',PostFix)
     delimiter = ',';
     formatSpec = '';
     for i = 1:NHL(4)
@@ -97,9 +108,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     
     
     
-    
-    
-%     filename = strcat(Network_Folder,'/Lambda.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder1,'/Lambda.csv',PostFix)
 %     delimiter = '';
 %     formatSpec = '%f%[^\n\r]';
 %     fileID = fopen(filename,'r');
@@ -109,7 +118,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 %     Lambda = LambdaTemp;
 % 
-%     filename = strcat(Network_Folder,'/re.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder1,'/re.csv',PostFix)
 %     delimiter = '';
 %     formatSpec = '%f%[^\n\r]';
 %     fileID = fopen(filename,'r');
@@ -120,7 +129,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     re = reTemp;
 % 
 % 
-%     filename = strcat(Network_Folder,'/b1.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder2,'/b1.csv',PostFix)
 %     delimiter = '';
 %     formatSpec = '%f%[^\n\r]';
 %     fileID = fopen(filename,'r');
@@ -129,7 +138,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     b1 = dataArray{:, 1};
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 % 
-%     filename = strcat(Network_Folder,'/W1.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder2,'/W1.csv',PostFix)
 %     delimiter = ',';
 %     formatSpec = '';
 %     for i = 1:NHL(2)
@@ -143,7 +152,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 % 
 % 
-%     filename = strcat(Network_Folder,'/b2.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder3,'/b2.csv',PostFix)
 %     delimiter = '';
 %     formatSpec = '%f%[^\n\r]';
 %     fileID = fopen(filename,'r');
@@ -152,7 +161,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     b2 = dataArray{:, 1};
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 % 
-%     filename = strcat(Network_Folder,'/W2.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder3,'/W2.csv',PostFix)
 %     delimiter = ',';
 %     formatSpec = '';
 %     for i = 1:NHL(3)
@@ -166,7 +175,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 % 
 % 
-%     filename = strcat(Network_Folder,'/b3.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder4,'/b3.csv',PostFix)
 %     delimiter = '';
 %     formatSpec = '%f%[^\n\r]';
 %     fileID = fopen(filename,'r');
@@ -175,7 +184,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     b3 = dataArray{:, 1};
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
 % 
-%     filename = strcat(Network_Folder,'/W3.csv',PostFix);
+%     filename = strcat(Network_Folder,Folder4,'/W3.csv',PostFix)
 %     delimiter = ',';
 %     formatSpec = '';
 %     for i = 1:NHL(4)
@@ -187,11 +196,12 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
 %     fclose(fileID);
 %     W3 = [dataArray{1:end-1}];
 %     clearvars filename delimiter formatSpec fileID dataArray ans;
+%     
     
     
   elseif strcmp(NetworkType,'Pol')
     
-    filename = strcat(Network_Folder,'/BondOrderLayer/Lambda.csv');
+    filename = strcat(Network_Folder,'/Lambda.csv');
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
@@ -201,7 +211,7 @@ function [Lambda, re, W1, W2, W3, b1, b2, b3] = ReadParametersDeterm()
     clearvars filename delimiter formatSpec fileID dataArray ans;
     Lambda = LambdaTemp;
 
-    filename = strcat(Network_Folder,'/BondOrderLayer/re.csv');
+    filename = strcat(Network_Folder,'/re.csv');
     delimiter = '';
     formatSpec = '%f%[^\n\r]';
     fileID = fopen(filename,'r');
