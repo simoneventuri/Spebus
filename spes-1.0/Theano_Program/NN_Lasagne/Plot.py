@@ -7,13 +7,15 @@ import math
 from NNInput     import NNInput
 
 
-def plot_history(NNInput, TrainEpochVec, Train, ValidEpochVec, Valid):
+def plot_history(NNInput, TrainEpochVec, TrainErrorVec, ValidErrorVec, TestEpochVec, TestErrorVec):
     fig = plt.figure()
     plt.xlabel('Epoch')
     plt.ylabel('Mean Abs Error [1000$]')
-    plt.plot(TrainEpochVec, numpy.array(Train), label='Train Error')
-    plt.plot(ValidEpochVec, numpy.array(Valid), label='Validation Error')
+    plt.plot(TrainEpochVec, numpy.array(TrainErrorVec), label='Train Error')
+    plt.plot(TrainEpochVec, numpy.array(ValidErrorVec), label='Validation Error')
+    plt.plot(TestEpochVec,  numpy.array(TestErrorVec),  label='Test Error')
     plt.legend()
+    plt.yscale("log")
     #plt.ylim([0, 5])
     #plt.show()
     FigPath = NNInput.PathToOutputFldr + '/ErrorHistory.png'

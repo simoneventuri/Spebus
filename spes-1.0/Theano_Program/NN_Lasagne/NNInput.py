@@ -24,7 +24,7 @@ class NNInput(object):
     # PreLogShift            = 1.0
     # PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat_David/PES_' + iPES + '/'
     System                 = 'O3'
-    iPES                   = '3'
+    iPES                   = '9'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
     PreLogShift            = -3.5
@@ -71,14 +71,14 @@ class NNInput(object):
     NormalizeDataFlg       = False
     CheckpointPath         = PathToOutputFldr + '/training_1/cp.ckpt'    
 
-    NEpoch                 = 200000
-    NMiniBatch             = 40
+    NEpoch                 = 30000
+    NMiniBatch             = 20
     NIterMax               = 10000000000
     NPatience              = 1000000   
     NDeltaPatience         = 2        
     ImpThold               = 0.995    
 
-    Method                 = 'adadelta'   # nesterov, rmsprop, adamax, amsgrad
+    Method                 = 'adadelta'   # nesterov, rmsprop, adamax, amsgrad, adadelta
     LearningRate           = 1.0
     kMomentum              = 0.9
     EarlyStoppingFlg       = False

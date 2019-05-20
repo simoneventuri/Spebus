@@ -18,7 +18,7 @@ BondOrderFun         = 'MorseFun'
 PIPFun               = 'Simone'
 NetworkType          = 'NN'
   %NOrd               = 10
-  NHL                  = [6,10,10,1];
+  NHL                  = [6,30,20,1];
   
 iFigure              = 1;
 SaveSampledOutputFlg = true
@@ -42,11 +42,11 @@ elseif strcmp(System,'O3')
   RFile                = '/Users/sventuri/GoogleDrive/O3_PES9/AbInitioPoints/'
   RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
   TestFileName         = 'RE.csv.60'
-  Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/NeuralNetwork[10,10]/Calibrated_AbInitio_Old/'
-  %Network_Folder       = '/Users/sventuri/WORKSPACE/CG-QCT/cg-qct/dtb/O3/PESs/NN/NN_11A1/10_10/'
+  %Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/NeuralNetwork[10,10]/Calibrated_AbInitio/'
+  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_30_20_Triat/O3_9_3020_LogError_NoNoise_m3.5/'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
-  alphaPlot            = 60%[[35:5:175],[106.75:10:126.75]]
+  alphaPlot            = [[35:5:175],[106.75:10:126.75]]
   alphaVec             = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
   RMin                 = 2.2820248
@@ -100,8 +100,10 @@ end
 
 
 %% LOADING PIP'S PARAMETERS
-[G_MEAN, G_SD] = ReadScales();
+%[G_MEAN, G_SD] = ReadScales();
 
+G_MEAN=[0,0,0];
+G_SD=[1,1,1];
 %% LOADING NN's PARAMETERS
 if strcmp(NetworkType,'GP')
   [Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadParametersGP();

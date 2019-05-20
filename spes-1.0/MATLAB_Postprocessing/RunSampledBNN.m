@@ -22,15 +22,15 @@ NetworkType          = 'NN'
   
 iFigure              = 1;
 
-UseSamplesFlg        = 2
+UseSamplesFlg        = 3
 StartSample          = 1
-FinalSample          = 300
+FinalSample          = 1
 NSamples             = FinalSample-StartSample+1;
 NSigma               = 1  
 SaveSampledOutputFlg = false
 ComputeCut           = false
 %CheckPostVec         = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
-CheckPostVec         = [100]
+CheckPostVec         = []
 NSigmaInt            = 3.0
 
 if strcmp(System,'N3')
@@ -106,7 +106,7 @@ end
 G_MEAN=0.0;G_SD=0.0;
 
 %% LOADING PARAMETER'S POSTERIOR DISTRIBUTIONS
-if (UseSamplesFlg < 2)
+if (UseSamplesFlg < 2) || (UseSamplesFlg == 3)
   [Lambda_MEAN, re_MEAN, W1_MEAN, W2_MEAN, W3_MEAN, b1_MEAN, b2_MEAN, b3_MEAN, Sigma_MEAN, Lambda_SD, re_SD, W1_SD, W2_SD, W3_SD, b1_SD, b2_SD, b3_SD, Sigma_SD] = ReadParametersStats();
   %[iFigure] = PlotParametersPosterior(iFigure, Lambda_MEAN, re_MEAN, W1_MEAN, W2_MEAN, W3_MEAN, b1_MEAN, b2_MEAN, b3_MEAN, Sigma_MEAN, Lambda_SD, re_SD, W1_SD, W2_SD, W3_SD, b1_SD, b2_SD, b3_SD, Sigma_SD)
  
@@ -139,9 +139,12 @@ while iSample <= FinalSample
   iSample
   
   %% OBTAINING PARAMETERS
-  if (UseSamplesFlg == 2)
+  if (UseSamplesFlg == 3)
+    [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist] = ComputeParametersMaxPost(iSample, Lambda_MEAN, Lambda_SD, re_MEAN, re_SD, W1_MEAN, W1_SD, W2_MEAN, W2_SD, W3_MEAN, W3_SD, b1_MEAN, b1_SD, b2_MEAN, b2_SD, b3_MEAN, b3_SD, Sigma_MEAN, Sigma_SD, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist);
+    Noise  = 0.0;
+  elseif (UseSamplesFlg == 2)
     [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist, Noise_Hist] = ReadParametersSamples(iSample, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist, Noise_Hist);
-    %Noise  = normrnd(0.0, Sigma);
+    Noise  = normrnd(0.0, Sigma);
   elseif (UseSamplesFlg == 1)
     Lambda = ones(3,1) .* Lambda_LHS(iSample);
     re     = ones(3,1) .* re_LHS(iSample);

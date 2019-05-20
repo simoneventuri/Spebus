@@ -91,7 +91,7 @@ def load_data(NNInput):
     PathToLabeledInput = NNInput.PathToDataFldr + '/R.csv'
     xData = load_labeled_input(PathToLabeledInput)
     xData = PIP_A3(NNInput, xData, NNInput.Lambda)
-
+    
     NTot        = xData.shape[0]
     NIn         = xData.shape[1]
     NTest       = math.floor(NTot * NNInput.PercTest)
@@ -137,6 +137,7 @@ def load_data(NNInput):
     rVal   = [(xSetTrainValid, ySetTrainValid), (xSetTest, ySetTest)]
 
     if (NNInput.TryNNFlg):
+        print(mean, std)
         rPrint = [get_print_data(NNInput, Ang, mean, std) for Ang in NNInput.AngVector]
         return rVal, rPrint
     else:

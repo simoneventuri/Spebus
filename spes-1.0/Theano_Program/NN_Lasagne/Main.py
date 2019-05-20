@@ -118,6 +118,8 @@ def sgd_optimization(NNInput):
     RSetValid, GSetValid, ySetValid, ySetValidDiat, ySetValidTriat = datasets[1]
     RSetTest,  GSetTest,  ySetTest,  ySetTestDiat,  ySetTestTriat  = datasets[2]
 
+    print(ySetTrain.get_value())
+
 
     plot_set(NNInput, RSetTrain.get_value(), ySetTrainDiat.get_value(), RSetValid.get_value(), ySetValidDiat.get_value(), RSetTest.get_value(), ySetTestDiat.get_value())
     
@@ -155,19 +157,24 @@ def sgd_optimization(NNInput):
 
     TrainPrediction  = lasagne.layers.get_output(Layers[-1])
     if (NNInput.LossFunction == 'squared_error'):
-        #TrainError       = T.abs_( ( TrainPrediction - TargetVar ) )
-        #TrainLoss        = lasagne.objectives.squared_error( TrainPrediction, TargetVar )
-        TrainError       = T.abs_( ( T.log(T.abs_(TrainPrediction)) - T.log(T.abs_(TargetVar)) ) )
-        TrainLoss        = lasagne.objectives.squared_error( T.log(T.abs_(TrainPrediction)), T.log(T.abs_(TargetVar)) )
-    elif (NNInput.LossFunction == 'normalized_squared_error'):
-        TrainError       = T.abs_( (TrainPrediction - TargetVar ) / T.abs_(TargetVar)**NNInput.OutputExpon )
-        TrainLoss        = normalized_squared_error(T.log(TrainPrediction), T.log(TargetVar), NNInput.OutputExpon)
-    elif (NNInput.LossFunction == 'huber_loss'):
-        TrainError       = T.abs_( (TrainPrediction - TargetVar) )
-        TrainLoss        = lasagne.objectives.huber_loss(TrainPrediction, TargetVar, delta=5)
-    elif (NNInput.LossFunction == 'weighted_squared_error'):
-        TrainError       = T.abs_( (TrainPrediction - TargetVar) )
-        TrainLoss        = weighted_squared_error(TrainPrediction, TargetVar, NNInput.Shift, NNInput.Power)
+        mu, sigma    = 0.0, 0.01 # mean and standard deviation
+        TrainError   = T.sqr( TrainPrediction - TargetVar )
+        #TrainError       = T.sqr( T.log(T.abs_(TrainPrediction)) - T.log(T.abs_(TargetVar)) )
+        #TrainError       = T.sqrt(TrainError.mean())
+        TrainError   = TrainError.mean()
+
+        TrainLoss    = lasagne.objectives.squared_error( TrainPrediction, TargetVar + numpy.random.normal(mu, sigma) )
+        #TrainLoss        = lasagne.objectives.squared_error( T.log(T.abs_(TrainPrediction)), T.log(T.abs_(TargetVar)) )
+
+    # elif (NNInput.LossFunction == 'normalized_squared_error'):
+    #     TrainError       = T.abs_( (TrainPrediction - TargetVar ) / T.abs_(TargetVar)**NNInput.OutputExpon )
+    #     TrainLoss        = normalized_squared_error(T.log(TrainPrediction), T.log(TargetVar), NNInput.OutputExpon)
+    # elif (NNInput.LossFunction == 'huber_loss'):
+    #     TrainError       = T.abs_( (TrainPrediction - TargetVar) )
+    #     TrainLoss        = lasagne.objectives.huber_loss(TrainPrediction, TargetVar, delta=5)
+    # elif (NNInput.LossFunction == 'weighted_squared_error'):
+    #     TrainError       = T.abs_( (TrainPrediction - TargetVar) )
+    #     TrainLoss        = weighted_squared_error(TrainPrediction, TargetVar, NNInput.Shift, NNInput.Power)
 
     if (NNInput.Model == 'ModPIP'):
         LayersK          = {Layers[2]: 1, Layers[3]: 1, Layers[4]: 1}
@@ -183,6 +190,8 @@ def sgd_optimization(NNInput):
     params           = lasagne.layers.get_all_params(Layers[-1], trainable=True)
     if (NNInput.Method == 'nesterov'):
         updates          = lasagne.updates.nesterov_momentum(TrainLoss, params, learning_rate=NNInput.LearningRate, momentum=NNInput.kMomentum)
+    elif (NNInput.Method == 'sgd'):
+        updates          = lasagne.updates.sgd(TrainLoss, params, learning_rate=NNInput.LearningRate)
     elif (NNInput.Method == 'rmsprop'):
         updates          = lasagne.updates.rmsprop(TrainLoss, params, learning_rate=NNInput.LearningRate, rho=NNInput.RMSProp[0], epsilon=1e-06)
     elif (NNInput.Method == 'adamax'):
@@ -197,23 +206,43 @@ def sgd_optimization(NNInput):
 
 
     ValidPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
-
     if (NNInput.LossFunction == 'squared_error'):
-        # ValidError      = T.sqr( ValidPrediction - TargetVar )
-        ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
-        ValidError      = T.sqrt(ValidError.mean())
-    elif (NNInput.LossFunction == 'normalized_squared_error'):
-        ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
-        ValidError      = T.sqrt(ValidError.mean())
-    elif (NNInput.LossFunction == 'huber_loss'):
-        ValidError      = T.sqr(ValidPrediction - TargetVar)
-        ValidError      = T.sqrt(ValidError.mean())
-    elif (NNInput.LossFunction == 'weighted_squared_error'):
-        Vi              = T.maximum(ValidPrediction, NNInput.Shift)
-        w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
-        ValidError      = w * T.sqr(ValidPrediction - TargetVar)
-        ValidError      = T.sqrt(ValidError.mean())
+        ValidError  = T.sqr( ValidPrediction - TargetVar )
+        #ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
+        #ValidError      = T.sqrt(ValidError.mean())
+        ValidError  = ValidError.mean()
+    # elif (NNInput.LossFunction == 'normalized_squared_error'):
+    #     ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
+    # elif (NNInput.LossFunction == 'huber_loss'):
+    #     ValidError      = T.sqr(ValidPrediction - TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
+    # elif (NNInput.LossFunction == 'weighted_squared_error'):
+    #     Vi              = T.maximum(ValidPrediction, NNInput.Shift)
+    #     w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
+    #     ValidError      = w * T.sqr(ValidPrediction - TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
     ValFn   = theano.function(inputs=[InputVar, TargetVar], outputs=ValidError)
+
+
+    TestPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
+    if (NNInput.LossFunction == 'squared_error'):
+        TestError = T.sqr( TestPrediction - TargetVar)
+        #ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
+        #ValidError      = T.sqrt(ValidError.mean())
+        TestError  = TestError.mean()
+    # elif (NNInput.LossFunction == 'normalized_squared_error'):
+    #     ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
+    # elif (NNInput.LossFunction == 'huber_loss'):
+    #     ValidError      = T.sqr(ValidPrediction - TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
+    # elif (NNInput.LossFunction == 'weighted_squared_error'):
+    #     Vi              = T.maximum(ValidPrediction, NNInput.Shift)
+    #     w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
+    #     ValidError      = w * T.sqr(ValidPrediction - TargetVar)
+    #     ValidError      = T.sqrt(ValidError.mean())
+    TestFn = theano.function(inputs=[InputVar, TargetVar], outputs=TestError)
 
 
     ###############
@@ -270,7 +299,6 @@ def sgd_optimization(NNInput):
             #TempShift = numpy.asscalar(Layers[-1].b.get_value())
             TempShift = 0.0
 
-            #[ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets)
             [ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets)
             #TrainErorrVec = numpy.append(TrainErorrVec, ThisValidError)
 
@@ -282,7 +310,7 @@ def sgd_optimization(NNInput):
                     ValidInputs, ValidTargets = ValidBatch
                     #ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
                     ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
-                ThisValidError        = numpy.mean(ValidErorrVec)
+                ThisValidError    = numpy.mean(ValidErorrVec)
                 #ValidEpochVec = numpy.append(ValidEpochVec, iEpoch)
                 #Valid         = numpy.append(Valid,         ThisValidError)
 
@@ -307,7 +335,7 @@ def sgd_optimization(NNInput):
                     for TestBatch in iterate_minibatches(xSetTest, ySetTest, NTest, shuffle=False):
                         TestInputs, TestTargets = TestBatch
                         #TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets))
-                        TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets))
+                        TestErrorVec = numpy.append(TestErrorVec, TestFn(TestInputs, TestTargets))
                     TestScore  = numpy.mean(TestErrorVec)
 
                     print(('        iEpoch %i, minibatch %i/%i, test error of best model %f') % (iEpoch, iMiniBatch + 1, NBatchTrain, TestScore))
@@ -459,7 +487,7 @@ def sgd_optimization(NNInput):
     plot_scatter(NNInput, yPredOrig, yDataOrig)
     #plot_overall_error(NNInput, yPredOrig, yDataOrig)
 
-    # plot_history(NNInput, TrainEpochVec, Train, ValidEpochVec, Valid)
+    #plot_history(NNInput, TrainEpochVec, Train, ValidEpochVec, Valid)
 
 
     tEnd = timeit.default_timer()
