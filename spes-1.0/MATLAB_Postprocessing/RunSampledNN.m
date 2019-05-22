@@ -43,7 +43,7 @@ elseif strcmp(System,'O3')
   RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
   TestFileName         = 'RE.csv.60'
   %Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/NeuralNetwork[10,10]/Calibrated_AbInitio/'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_30_20_Triat/O3_9_3020_LogError_NoNoise_m3.5/'
+  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_30_20_Triat/O3_9_3020_m35_LogError_0005Noise/'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
   alphaPlot            = [[35:5:175],[106.75:10:126.75]]

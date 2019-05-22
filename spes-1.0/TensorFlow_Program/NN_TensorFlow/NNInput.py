@@ -34,15 +34,15 @@ class NNInput(object):
     if (Model=='ModPIP'):
         LayersName             = ['InputLayer',              'BondOrderLayer',                    'PIPLayer',              'HiddenLayer1',              'HiddenLayer2',      'OutputLayer']
         ActFun                 = [                                       None,                          None,                  tf.nn.tanh,                  tf.nn.tanh,               None]
-        NHid                   = [                                          3,                             6,                          20,                          10                    ]
+        NHid                   = [                                          3,                             6,                          10,                          10                    ]
         NLayers                = []
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
         PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
         PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
-        CheckpointFilePath     = PathToOutputFldr + '/training_1/cp.ckpt'    
-        CheckpointFldr         = PathToOutputFldr + '/training_1/'    
+        CheckpointFilePath     = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ/training_1/cp.ckpt'    
+        CheckpointFldr         = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ/training_1/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -67,11 +67,11 @@ class NNInput(object):
     NIn                    = 3
     NOut                   = 1
     PercTrain              = 1.0
-    PercValid              = 0.05
+    PercValid              = 0.2
     RandomizeDataFlg       = True
     NormalizeDataFlg       = False
 
-    NEpoch                 = 10000
+    NEpoch                 = 20000
     NMiniBatch             = 30
     NPatience              = 1000   
     NDeltaPatience         = 2        
@@ -84,7 +84,7 @@ class NNInput(object):
     RMSProp                = [0.85, 0.1]
     kWeightDecay           = [1.e-100, 1.e-100]
 
-    LossFunction           = 'mean_squared_logarithmic_error' # mean_squared_logarithmic_error, mse
+    LossFunction           = 'mse' # mean_squared_logarithmic_error, mse
     OutputExpon            = 0.0
     Power                  = 5.0
     Shift                  = 7.27216
@@ -195,7 +195,7 @@ class NNInput(object):
             self.Method                 = Method
             self.RMSProp                = RMSProp
             self.kWeightDecay           = kWeightDecay
-            self.CheckpointFilePath     = PathToOutputFldr + '/training_1/cp.ckpt'
+            self.CheckpointFilePath     = CheckpointFilePath
             self.PathToOutputFldr       = PathToOutputFldr
             self.TryNNFlg               = TryNNFlg
             self.GetIniWeightsFlg       = GetIniWeightsFlg

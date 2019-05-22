@@ -80,11 +80,6 @@ def sgd_optimization(NNInput):
     model = build_MLP_model(NNInput)
     #model.summary()
 
-    PathToFileWriter = NNInput.PathToOutputFldr + '/TB1.png'
-    #plot_model(model, to_file=PathToFileWriter)
-    #writer = tf.summary.FileWriter(PathToFileWriter)
-    #writer.add_graph(sess.graph)
-
 
 
     ###############
@@ -217,11 +212,6 @@ def evaluate_model(NNInput):
 
     model = build_MLP_model(NNInput)
     #model.summary()
-
-    PathToFileWriter = NNInput.PathToOutputFldr + '/TB1.png'
-    #plot_model(model, to_file=PathToFileWriter)
-    #writer = tf.summary.FileWriter(PathToFileWriter)
-    #writer.add_graph(sess.graph)
 
     
 

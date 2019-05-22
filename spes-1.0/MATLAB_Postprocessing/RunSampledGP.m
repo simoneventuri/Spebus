@@ -45,12 +45,12 @@ elseif strcmp(System,'O3')
   RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
   TestFileName         = 'RE.csv.120'
   %Network_Folder       = '/home/aracca/WORKSPACE/SPES/Output_DELL/GP/Par/O3_Analytical/PES_9/809_G1Dif/'
-  Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/GaussianProcesses/Calibrated_AbInitio_DIF/'
+  Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/GaussianProcesses/PES9_AbInitio_809/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_ENTROPY/ModPIP_Stoch_10_10_Triat/O3_1/ParamsPosts/'
   %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIPPol_Determ_10_Triat/O3_1'
   %alphaVec             = [110.0,     170.0,    60.0,     116.75]
   %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
-  alphaPlot            = 60%[[35:5:175],[106.75:10:126.75]]
+  alphaPlot            = [[35:5:175],[106.75:10:126.75]]
   alphaVec             = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
   RMin                 = 2.2820248
@@ -106,11 +106,11 @@ end
 [ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern] = ReadParameters_GP()
 
 %% CHECKING DERIVATIVES
-AngVec = [60.0,110,116.75,170];
-ComputePESDerivatives_GP(AngVec, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
+% AngVec = [60.0,110,116.75,170];
+% ComputePESDerivatives_GP(AngVec, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
 
 % PLOT CUTS
-[iFigure] = PlotCuts_GP(iFigure, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
+% [iFigure] = PlotCuts_GP(iFigure, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern)
 
 %% PLOT scatter PLOTS
 [iFigure] = PlotScatter_GP(iFigure, RData, EData, EDataDiat, EFitted, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Amp, Alpha, LKern);
