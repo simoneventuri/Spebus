@@ -27,119 +27,99 @@ from TransformOutput import InverseTransformation
 #THEANO_FLAGS=mode=DEBUG_MODE python3 Main.py
 
 def sgd_optimization(NNInput):
-    """
-    Demonstrate stochastic gradient descent optimization of a log-linear model
 
-    :type LearningRate: float
-    :param LearningRate: learning rate used (factor for the stochastic gradient)
-
-    :type NEpoch: int
-    :param NEpoch: maximal number of epochs to run the optimizer
-
-    :type PathToData: string
-    :param PathToData: the path of the dataset file
-
-    """
-
-    def normalized_squared_error(a, b, expon):
-        """Computes the element-wise squared normalized difference between two tensors.
-        .. math:: L = ( (p - t) / t )^2
-        Parameters
-        ----------
-        a, b : Theano tensor
-            The tensors to compute the squared difference between.
-        Returns
-        -------
-        Theano tensor
-            An expression for the item-wise squared difference.
-        """
-        a, b = align_targets(a, b)
-        return T.square((a - b) / T.abs_(b)**expon)
-        # / T.abs_(TargetVar)**(0.0) / T.abs_(b)**expon
+    # def normalized_squared_error(a, b, expon):
+    #     """Computes the element-wise squared normalized difference between two tensors.
+    #     .. math:: L = ( (p - t) / t )^2
+    #     Parameters
+    #     ----------
+    #     a, b : Theano tensor
+    #         The tensors to compute the squared difference between.
+    #     Returns
+    #     -------
+    #     Theano tensor
+    #         An expression for the item-wise squared difference.
+    #     """
+    #     a, b = align_targets(a, b)
+    #     return T.square((a - b) / T.abs_(b)**expon)
+    #     # / T.abs_(TargetVar)**(0.0) / T.abs_(b)**expon
 
 
 
-    def weighted_squared_error(a, b, Shift, Power):
-        """Computes the element-wise squared normalized difference between two tensors.
-        .. math:: L = ( (p - t) / t )^2
-        Parameters
-        ----------
-        a, b : Theano tensor
-            The tensors to compute the squared difference between.
-        Returns
-        -------
-        Theano tensor
-            An expression for the item-wise squared difference.
-        """
-        a, b = align_targets(a, b)
-        Vi   = T.maximum(b, Shift)
-        w    = T.power(Shift/b, Power)
-        return w * T.square(a - b)
-        # / T.abs_(TargetVar)**(0.0) / T.abs_(b)**expon
+    # def weighted_squared_error(a, b, Shift, Power):
+    #     """Computes the element-wise squared normalized difference between two tensors.
+    #     .. math:: L = ( (p - t) / t )^2
+    #     Parameters
+    #     ----------
+    #     a, b : Theano tensor
+    #         The tensors to compute the squared difference between.
+    #     Returns
+    #     -------
+    #     Theano tensor
+    #         An expression for the item-wise squared difference.
+    #     """
+    #     a, b = align_targets(a, b)
+    #     Vi   = T.maximum(b, Shift)
+    #     w    = T.power(Shift/b, Power)
+    #     return w * T.square(a - b)
+    #     # / T.abs_(TargetVar)**(0.0) / T.abs_(b)**expon
 
 
 
-    def align_targets(predictions, targets):
-        """Helper function turning a target 1D vector into a column if needed.
-        This way, combining a network of a single output unit with a target vector
-        works as expected by most users, not broadcasting outputs against targets.
-        Parameters
-        ----------
-        predictions : Theano tensor
-            Expression for the predictions of a neural network.
-        targets : Theano tensor
-            Expression or variable for corresponding targets.
-        Returns
-        -------
-        predictions : Theano tensor
-            The predictions unchanged.
-        targets : Theano tensor
-            If `predictions` is a column vector and `targets` is a 1D vector,
-            returns `targets` turned into a column vector. Otherwise, returns
-            `targets` unchanged.
-        """
-        if (getattr(predictions, 'broadcastable', None) == (False, True) and
-                getattr(targets, 'ndim', None) == 1):
-            targets = as_theano_expression(targets).dimshuffle(0, 'x')
-        return predictions, targets
+    # def align_targets(predictions, targets):
+    #     """Helper function turning a target 1D vector into a column if needed.
+    #     This way, combining a network of a single output unit with a target vector
+    #     works as expected by most users, not broadcasting outputs against targets.
+    #     Parameters
+    #     ----------
+    #     predictions : Theano tensor
+    #         Expression for the predictions of a neural network.
+    #     targets : Theano tensor
+    #         Expression or variable for corresponding targets.
+    #     Returns
+    #     -------
+    #     predictions : Theano tensor
+    #         The predictions unchanged.
+    #     targets : Theano tensor
+    #         If `predictions` is a column vector and `targets` is a 1D vector,
+    #         returns `targets` turned into a column vector. Otherwise, returns
+    #         `targets` unchanged.
+    #     """
+    #     if (getattr(predictions, 'broadcastable', None) == (False, True) and
+    #             getattr(targets, 'ndim', None) == 1):
+    #         targets = as_theano_expression(targets).dimshuffle(0, 'x')
+    #     return predictions, targets
 
 
     ##################################################################################################################################
     ### LOADING DATA
     ##################################################################################################################################
-    print('\nLoading Data ... \n')
-
     if (NNInput.TryNNFlg > 0):
-        datasets, datasetsTry, G_MEAN, G_SD, RDataOrig, yDataOrig, yDataDiatOrig = load_data(NNInput)
+        datasets, datasetsTry = load_data(NNInput)
     else:
-        datasets, G_MEAN, G_SD, RDataOrig, yDataOrig, yDataDiatOrig = load_data(NNInput)
+        datasets = load_data(NNInput)
 
-    RSetTrain, GSetTrain, ySetTrain, ySetTrainDiat, ySetTrainTriat = datasets[0]
-    RSetValid, GSetValid, ySetValid, ySetValidDiat, ySetValidTriat = datasets[1]
-    RSetTest,  GSetTest,  ySetTest,  ySetTestDiat,  ySetTestTriat  = datasets[2]
+    RSetTrain, ySetTrain, ySetTrainDiat, ySetTrainTriat = datasets[0]
+    RSetValid, ySetValid, ySetValidDiat, ySetValidTriat = datasets[1]
+    RDataOrig, yDataOrig, yDataDiatOrig, yDataTriatOrig = datasets[2]
 
-    print(ySetTrain.get_value())
-
-
-    plot_set(NNInput, RSetTrain.get_value(), ySetTrainDiat.get_value(), RSetValid.get_value(), ySetValidDiat.get_value(), RSetTest.get_value(), ySetTestDiat.get_value())
-    
     NNInput.NIn  = RSetTrain.get_value(borrow=True).shape[1]
-    NNInput.NOut = ySetTrain.get_value(borrow=True).shape[1] 
-    print(('    Nb of Input:  %i')    % NNInput.NIn)
-    print(('    Nb of Output: %i \n') % NNInput.NOut)
-    if (NNInput.Model=='ModPIP') or (NNInput.Model=='PIP'):
-        NNInput.NLayers = NNInput.NHid
-        NNInput.NLayers.insert(0,NNInput.NIn)
-        NNInput.NLayers.append(NNInput.NOut)
+    #NNInput.NOut = ySetTrain.get_value(borrow=True).shape[1] 
+    print(('  Nb of Input:  %i')    % NNInput.NIn)
+    print(('  Nb of Output: %i \n') % 1)
 
-    NTrain      = RSetTrain.get_value(borrow=True).shape[0]
-    NBatchTrain = NTrain // NNInput.NMiniBatch
-    NValid      = RSetValid.get_value(borrow=True).shape[0]
-    NTest       = RSetTest.get_value(borrow=True).shape[0]
-    print(('    Nb of Training   Examples: %i')    % NTrain)
-    print(('    Nb of Training   Batches:  %i') % NBatchTrain)
-    print(('    Nb of Validation Examples: %i')    % NValid)
-    print(('    Nb of Test       Examples: %i \n') % NTest)
+    NNInput.NLayers = NNInput.NHid
+    NNInput.NLayers.insert(0,NNInput.NIn)
+    NNInput.NLayers.append(NNInput.NOut)
+    print('  Network Shape: ', NNInput.NLayers, '\n')
+
+    NTrain = RSetTrain.get_value(borrow=True).shape[0]
+    NBatchTrain = int(numpy.floor(NTrain / NNInput.NMiniBatch))
+    NValid = RSetValid.get_value(borrow=True).shape[0]
+    print('  Nb of Training + Validation Examples: ', NTrain + NValid, '; of which: ', NTrain, ' for Training and ', NValid, ' for Validation')
+    #NTest  = RSetTest.shape[0]
+    #print(('  Nb of Test                  Examples: %i \n') % NTest)
+
 
 
 
@@ -149,45 +129,14 @@ def sgd_optimization(NNInput):
     InputVar  = T.dmatrix('Inputs')
     #InputVar.tag.test_value  = numpy.random.randint(100,size=(100,3))
     InputVar.tag.test_value  = numpy.array([[1.0,2.0,7.0],[3.0,5.0,11.0]]) * 0.529177
-    TargetVar = T.dmatrix('Targets')
+    TargetVar = T.dvector('Targets')
     #TargetVar.tag.test_value = numpy.random.randint(100,size=(100,1))
 
 
-    Layers = create_nn(NNInput, InputVar, TargetVar, G_MEAN, G_SD)
+    Layers = create_nn(NNInput, InputVar, TargetVar)
 
-    TrainPrediction  = lasagne.layers.get_output(Layers[-1])
-    if (NNInput.LossFunction == 'squared_error'):
-        mu, sigma    = 0.0, 0.01 # mean and standard deviation
-        TrainError   = T.sqr( TrainPrediction - TargetVar )
-        #TrainError       = T.sqr( T.log(T.abs_(TrainPrediction)) - T.log(T.abs_(TargetVar)) )
-        #TrainError       = T.sqrt(TrainError.mean())
-        TrainError   = TrainError.mean()
 
-        TrainLoss    = lasagne.objectives.squared_error( TrainPrediction, TargetVar + numpy.random.normal(mu, sigma) )
-        #TrainLoss        = lasagne.objectives.squared_error( T.log(T.abs_(TrainPrediction)), T.log(T.abs_(TargetVar)) )
-
-    # elif (NNInput.LossFunction == 'normalized_squared_error'):
-    #     TrainError       = T.abs_( (TrainPrediction - TargetVar ) / T.abs_(TargetVar)**NNInput.OutputExpon )
-    #     TrainLoss        = normalized_squared_error(T.log(TrainPrediction), T.log(TargetVar), NNInput.OutputExpon)
-    # elif (NNInput.LossFunction == 'huber_loss'):
-    #     TrainError       = T.abs_( (TrainPrediction - TargetVar) )
-    #     TrainLoss        = lasagne.objectives.huber_loss(TrainPrediction, TargetVar, delta=5)
-    # elif (NNInput.LossFunction == 'weighted_squared_error'):
-    #     TrainError       = T.abs_( (TrainPrediction - TargetVar) )
-    #     TrainLoss        = weighted_squared_error(TrainPrediction, TargetVar, NNInput.Shift, NNInput.Power)
-
-    if (NNInput.Model == 'ModPIP'):
-        LayersK          = {Layers[2]: 1, Layers[3]: 1, Layers[4]: 1}
-    elif (NNInput.Model=='ModPIPPol'):
-        LayersK          = {Layers[1]: 1}
-    elif (NNInput.Model=='PIP'):
-        LayersK          = {Layers[0]: 1, Layers[1]: 1, Layers[2]: 1}
-    L2Penalty        = regularize_layer_params_weighted(LayersK, l2)
-    L1Penalty        = regularize_layer_params(LayersK, l1)
-    TrainLoss        = TrainLoss
-    TrainLoss        = TrainLoss.mean() #+ NNInput.kWeightDecay[0] * L1Penalty + NNInput.kWeightDecay[1] * L2Penalty
-
-    params           = lasagne.layers.get_all_params(Layers[-1], trainable=True)
+    params = lasagne.layers.get_all_params(Layers[-1], trainable=True)
     if (NNInput.Method == 'nesterov'):
         updates          = lasagne.updates.nesterov_momentum(TrainLoss, params, learning_rate=NNInput.LearningRate, momentum=NNInput.kMomentum)
     elif (NNInput.Method == 'sgd'):
@@ -202,47 +151,45 @@ def sgd_optimization(NNInput):
         updates          = lasagne.updates.adam(TrainLoss, params, learning_rate=NNInput.LearningRate, beta1=0.9, beta2=0.999, epsilon=1e-08)
     elif (NNInput.Method == 'adadelta'):
         updates          = lasagne.updates.adadelta(TrainLoss, params, learning_rate=NNInput.LearningRate, rho=0.95, epsilon=1e-08)
+
+
+    mu, sigma    = 0.0, NNInput.NoiseSigma
+    if (NNInput.NoiseFlg == 0):
+        Noise = 0
+    elif (NNInput.NoiseFlg == 1):
+        Noise = numpy.random.normal(mu, sigma)
+    elif (NNInput.NoiseFlg == 2):
+        Noise = numpy.random.normal(mu, sigma, (NNInput.NMiniBatch,1))
+
+
+    TrainPrediction  = lasagne.layers.get_output(Layers[-1])
+    if (NNInput.LossFunction == 'squared_error'):
+        TrainLoss = lasagne.objectives.squared_error( TrainPrediction, TargetVar + Noise)
+    elif (NNInput.LossFunction == 'mean_squared_logarithmic_error'):
+        TrainLoss = lasagne.objectives.squared_error( T.log(T.clip(TrainPrediction, 1e-10, 1.e10) + 1.0), T.log(T.clip(TargetVar + Noise, 1e-08, 1.e10) + 1.0) )
+    TrainLoss        = TrainLoss.mean() #+ NNInput.kWeightDecay[0] * L1Penalty + NNInput.kWeightDecay[1] * L2Penalty
+
+    TrainError   = T.abs_(TrainPrediction - TargetVar)
+    TrainError   = TrainError.mean()
+    #TrainError   = T.sqr( TrainPrediction - TargetVar )
+    #TrainError   = T.sqrt(TrainError.mean())
     TrainFn = theano.function(inputs=[InputVar, TargetVar], outputs=[TrainError, TrainLoss], updates=updates)
 
 
     ValidPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
-    if (NNInput.LossFunction == 'squared_error'):
-        ValidError  = T.sqr( ValidPrediction - TargetVar )
-        #ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
-        #ValidError      = T.sqrt(ValidError.mean())
-        ValidError  = ValidError.mean()
-    # elif (NNInput.LossFunction == 'normalized_squared_error'):
-    #     ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    # elif (NNInput.LossFunction == 'huber_loss'):
-    #     ValidError      = T.sqr(ValidPrediction - TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    # elif (NNInput.LossFunction == 'weighted_squared_error'):
-    #     Vi              = T.maximum(ValidPrediction, NNInput.Shift)
-    #     w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
-    #     ValidError      = w * T.sqr(ValidPrediction - TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    ValFn   = theano.function(inputs=[InputVar, TargetVar], outputs=ValidError)
+    ValidError   = T.abs_(ValidPrediction - TargetVar)
+    ValidError   = ValidError.mean()
+    #ValidError   = T.sqr( ValidPrediction - TargetVar )
+    #ValidError   = T.sqrt(ValidError.mean())
+    ValidFn = theano.function(inputs=[InputVar, TargetVar], outputs=ValidError)
 
 
-    TestPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
-    if (NNInput.LossFunction == 'squared_error'):
-        TestError = T.sqr( TestPrediction - TargetVar)
-        #ValidError      = T.sqr( T.log(T.abs_(ValidPrediction)) - T.log(T.abs_(TargetVar)) )
-        #ValidError      = T.sqrt(ValidError.mean())
-        TestError  = TestError.mean()
-    # elif (NNInput.LossFunction == 'normalized_squared_error'):
-    #     ValidError      = T.sqr((ValidPrediction - TargetVar) / TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    # elif (NNInput.LossFunction == 'huber_loss'):
-    #     ValidError      = T.sqr(ValidPrediction - TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    # elif (NNInput.LossFunction == 'weighted_squared_error'):
-    #     Vi              = T.maximum(ValidPrediction, NNInput.Shift)
-    #     w               = T.power(NNInput.Shift/TargetVar, NNInput.Power)
-    #     ValidError      = w * T.sqr(ValidPrediction - TargetVar)
-    #     ValidError      = T.sqrt(ValidError.mean())
-    TestFn = theano.function(inputs=[InputVar, TargetVar], outputs=TestError)
+    # TestPrediction = lasagne.layers.get_output(Layers[-1], deterministic=True)
+    # TestError   = TestPrediction - TargetVar
+    # TestError   = TestError.mean()
+    # #TestError   = T.sqr( TestPrediction - TargetVar )
+    # #TestError   = T.sqrt(TestError.mean())
+    # TestFn = theano.function(inputs=[InputVar, TargetVar], outputs=TestError)
 
 
     ###############
@@ -258,23 +205,22 @@ def sgd_optimization(NNInput):
     iEpoch                = 0
     LoopingFlg            = True
     iIterTot              = 0
-    Train                 = []
     TrainEpochVec         = []
-    Valid                 = []
-    ValidEpochVec         = []
+    TrainErrorVec         = []
+    ValidErrorVec         = []
+    TestEpochVec          = []
+    TestErrorVec          = []
     iTry                  = 0
 
-    TrainErorrVec = []
-    iMiniBatch    = 0 
     if (NNInput.Model=='ModPIP') or (NNInput.Model == 'ModPIPPol'):
         xSetTrain = RSetTrain
         xSetValid = RSetValid
-        xSetTest  = RSetTest
+        #xSetTest  = RSetTest
         xDataOrig = RDataOrig
     elif (NNInput.Model == 'PIP'):
         xSetTrain = GSetTrain
         xSetValid = GSetValid
-        xSetTest  = GSetTest
+        #xSetTest  = GSetTest
         #xDataOrig = GDataOrig
     # print(xSetTrain)
     # print(xSetValid)
@@ -290,117 +236,119 @@ def sgd_optimization(NNInput):
     while (iEpoch < NNInput.NEpoch) and (LoopingFlg):
         iEpoch += 1
 
-        iMiniBatch = 0
+
+        iMiniBatch      = 0
+        TrainErrorEpoch = 0
         for TrainBatch in iterate_minibatches(xSetTrain, ySetTrain, NNInput.NMiniBatch, shuffle=True):
-            TrainInputs, TrainTargets = TrainBatch
             iMiniBatch += 1
             iIterTot    = (iEpoch - 1) * NBatchTrain + iMiniBatch
-
-            #TempShift = numpy.asscalar(Layers[-1].b.get_value())
-            TempShift = 0.0
-
-            [ThisValidError, MiniBatchAvgCost] = TrainFn(TrainInputs, TrainTargets)
-            #TrainErorrVec = numpy.append(TrainErorrVec, ThisValidError)
-
-
-            if (iIterTot + 1) % fValid == 0:
-
-                ValidErorrVec = []
-                for ValidBatch in iterate_minibatches(xSetValid, ySetValid, NValid, shuffle=False):
-                    ValidInputs, ValidTargets = ValidBatch
-                    #ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
-                    ValidErorrVec = numpy.append(ValidErorrVec, ValFn(ValidInputs, ValidTargets))
-                ThisValidError    = numpy.mean(ValidErorrVec)
-                #ValidEpochVec = numpy.append(ValidEpochVec, iEpoch)
-                #Valid         = numpy.append(Valid,         ThisValidError)
-
-                # fig = plt.figure()
-                # plt.plot(ValidErorrVec, color='lightblue', linewidth=3)
-                # #ax.set_xlim(,)
-                # plt.show()
-
-                print( '\n    iEpoch %i, minibatch %i/%i, validation error %f' % (iEpoch, iMiniBatch + 1, NBatchTrain, ThisValidError) )
-
-                # if we got the best validation score until now
-                if ThisValidError < BestValidError:
-                    #improve patience if loss improvement is good enough
-                    #if (ThisValidError < BestValidError * NNInput.ImpThold):
-                        # NNInput.NPatience = max(NNInput.NPatience, iIterTot * NNInput.NDeltaPatience)
-
-                    BestValidError = ThisValidError
-                    BestIter       = iIterTot
-
-                    # test it on the test set
-                    TestErrorVec = []
-                    for TestBatch in iterate_minibatches(xSetTest, ySetTest, NTest, shuffle=False):
-                        TestInputs, TestTargets = TestBatch
-                        #TestErrorVec = numpy.append(TestErrorVec, ValFn(TestInputs, TestTargets))
-                        TestErrorVec = numpy.append(TestErrorVec, TestFn(TestInputs, TestTargets))
-                    TestScore  = numpy.mean(TestErrorVec)
-
-                    print(('        iEpoch %i, minibatch %i/%i, test error of best model %f') % (iEpoch, iMiniBatch + 1, NBatchTrain, TestScore))
+            TrainInputs, TrainTargets         = TrainBatch
+            [TrainErrorBatch, TrainLossBatch] = TrainFn(TrainInputs, TrainTargets)
+            TrainErrorEpoch                   = TrainErrorEpoch + TrainErrorBatch
+        TrainErrorEpoch = TrainErrorEpoch / iMiniBatch
+        TrainErrorVec   = numpy.append(TrainErrorVec, TrainErrorEpoch)
 
 
-                    if (NNInput.WriteFinalFlg > 0):
-                        
-                        for iLayer in range(len(NNInput.NLayers)-1):
+        ValidErorrEpoch = 0
+        iMiniBatch      = 0
+        for ValidBatch in iterate_minibatches(xSetValid, ySetValid, NValid, shuffle=False):
+            iMiniBatch += 1
+            ValidInputs, ValidTargets = ValidBatch
+            ValidErrorBatch           = ValidFn(ValidInputs, ValidTargets)
+            ValidErorrEpoch           = ValidErorrEpoch + ValidErrorBatch
+        ValidErorrEpoch = ValidErorrEpoch / iMiniBatch
+        ValidErrorVec   = numpy.append(ValidErrorVec, ValidErorrEpoch)
 
-                            PathToFldr = NNInput.PathToOutputFldr + Layers[iLayer].name + '/'
-                            if not os.path.exists(PathToFldr):
-                                os.makedirs(PathToFldr)
-                            PathToFile = PathToFldr + 'Weights.npz'
-                            numpy.savez(PathToFile, *lasagne.layers.get_all_param_values(Layers[iLayer]))
+        print( '\n    iEpoch %i: Training Error = %f; Validation Error %f' % (iEpoch, TrainErrorEpoch, ValidErorrEpoch) )
+        # fig = plt.figure()
+        # plt.plot(ValidErorrVec, color='lightblue', linewidth=3)
+        # #ax.set_xlim(,)
+        # plt.show()
 
-                            if (NNInput.WriteFinalFlg > 1):
-                                if (NNInput.Model == 'ModPIP'):
-                                    if (iLayer == 0) and (NNInput.BondOrderStr != 'DiatPotFun'):
-                                        save_parameters_PIP(PathToFldr, Layers[iLayer].Lambda.get_value(), Layers[iLayer].re.get_value())
-                                    elif (iLayer > 1):
-                                        if (NNInput.BiasesFlg):
-                                            save_parameters(PathToFldr, Layers[iLayer].W.get_value(), Layers[iLayer].b.get_value())
-                                        else:
-                                            save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
-                                elif (NNInput.Model == 'ModPIPPol'):
-                                    if (iLayer == 0) and (NNInput.BondOrderStr != 'DiatPotFun'):
-                                        save_parameters_PIP(PathToFldr, Layers[iLayer].Lambda.get_value(), Layers[iLayer].re.get_value())
-                                    elif (iLayer==1):
-                                        save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
-                                elif (NNInput.Model == 'PIP'):
-                                    if (NNInput.BiasesFlg):
-                                        save_parameters(PathToFldr, Layers[iLayer].W.get_value(), Layers[iLayer].b.get_value())
-                                    else:
-                                        save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
+        
+
+        # if we got the best validation score until now
+        if ValidErorrEpoch < BestValidError:
+            #improve patience if loss improvement is good enough
+            #if (ThisValidError < BestValidError * NNInput.ImpThold):
+                # NNInput.NPatience = max(NNInput.NPatience, iIterTot * NNInput.NDeltaPatience)
+
+            BestValidError = ValidErorrEpoch
+            BestIter       = iIterTot
+
+            # TestErrorEpoch = 0
+            # iMiniBatch     = 0
+            # for TestBatch in iterate_minibatches(xSetTest, ySetTest, NTest, shuffle=False):
+            #     iMiniBatch += 1
+            #     TestInputs, TestTargets = TestBatch
+            #     TestErrorBatch          = TestFn(TestInputs, TestTargets)
+            #     TestErrorEpoch          = TestErrorEpoch + TestErrorBatch
+            # TestErrorEpoch = TestErrorEpoch / iMiniBatch
+            # TestErrorVec   = numpy.append(TestErrorVec, TestErrorEpoch)
+
+            # print(('        iEpoch %i,  test error of best model %f') % (iEpoch, TestErrorEpoch))
+
+            # TestEpochVec   = numpy.append(TestEpochVec, iEpoch)
 
 
-                        if (NNInput.TryNNFlg > 1):
-                            i=-1
-                            for Ang in NNInput.AngVector:
-                                i=i+1
-                                iTry=iTry+1
-                                RSetTry, GSetTry, ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[i]
-                                if (NNInput.Model == 'ModPIP') or (NNInput.Model == 'ModPIPPol'):
-                                    xSetTry = RSetTry
-                                elif (NNInput.Model == 'PIP'):
-                                    xSetTry = GSetTry
-                                NTry                  = xSetTry.get_value(borrow=True).shape[0]
-                                NBatchTry             = NTry // NNInput.NMiniBatch
-                                yPredTry = lasagne.layers.get_output(Layers[-1], inputs=xSetTry) 
-                                if  (NNInput.TryNNFlg > 2):
-                                    PathToTryLabels = NNInput.PathToOutputFldr + '/REBestDet.csv.' + str(iTry)
+            if (NNInput.WriteFinalFlg > 0):
+                
+                for iLayer in range(len(NNInput.NLayers)-1):
+
+                    PathToFldr = NNInput.PathToOutputFldr + Layers[iLayer].name + '/'
+                    if not os.path.exists(PathToFldr):
+                        os.makedirs(PathToFldr)
+                    PathToFile = PathToFldr + 'Weights.npz'
+                    numpy.savez(PathToFile, *lasagne.layers.get_all_param_values(Layers[iLayer]))
+
+                    if (NNInput.WriteFinalFlg > 1):
+                        if (NNInput.Model == 'ModPIP'):
+                            if (iLayer == 0) and (NNInput.BondOrderStr != 'DiatPotFun'):
+                                save_parameters_PIP(PathToFldr, Layers[iLayer].Lambda.get_value(), Layers[iLayer].re.get_value())
+                            elif (iLayer > 1):
+                                if (NNInput.BiasesFlg):
+                                    save_parameters(PathToFldr, Layers[iLayer].W.get_value(), Layers[iLayer].b.get_value())
                                 else:
-                                    PathToTryLabels = NNInput.PathToOutputFldr + '/REBestDet.csv.' + str(Ang)
-                                yPredTry = T.cast(yPredTry, 'float64')
-                                yPredTry = yPredTry.eval()
-                                yPredTry = InverseTransformation(NNInput, yPredTry, ySetTryDiat.get_value())
-                                ySetTry = T.cast(ySetTry, 'float64')
-                                ySetTry = ySetTry.eval()
-                                ySetTry = InverseTransformation(NNInput, ySetTry, ySetTryDiat.get_value())
-                                save_to_plot(PathToTryLabels, 'Evaluated', numpy.concatenate((RSetTry.get_value(), ySetTry, yPredTry), axis=1))
-                    
+                                    save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
+                        elif (NNInput.Model == 'ModPIPPol'):
+                            if (iLayer == 0) and (NNInput.BondOrderStr != 'DiatPotFun'):
+                                save_parameters_PIP(PathToFldr, Layers[iLayer].Lambda.get_value(), Layers[iLayer].re.get_value())
+                            elif (iLayer==1):
+                                save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
+                        elif (NNInput.Model == 'PIP'):
+                            if (NNInput.BiasesFlg):
+                                save_parameters(PathToFldr, Layers[iLayer].W.get_value(), Layers[iLayer].b.get_value())
+                            else:
+                                save_parameters_NoBiases(PathToFldr, Layers[iLayer].W.get_value())
 
-                #ThisTrainError  = numpy.mean(TrainErorrVec)
-                #TrainEpochVec   = numpy.append(TrainEpochVec, iEpoch)
-                #Train           = numpy.append(Train,         ThisTrainError)
+
+            if (NNInput.TryNNFlg > 1):
+                i=-1
+                for Ang in NNInput.AngVector:
+                    i=i+1
+                    iTry=iTry+1
+                    RSetTry, GSetTry, ySetTry, ySetTryDiat, ySetTryTriat  = datasetsTry[i]
+                    if (NNInput.Model == 'ModPIP') or (NNInput.Model == 'ModPIPPol'):
+                        xSetTry = RSetTry
+                    elif (NNInput.Model == 'PIP'):
+                        xSetTry = GSetTry
+                    NTry                  = xSetTry.get_value(borrow=True).shape[0]
+                    NBatchTry             = NTry // NNInput.NMiniBatch
+                    yPredTry = lasagne.layers.get_output(Layers[-1], inputs=xSetTry) 
+                    if  (NNInput.TryNNFlg > 2):
+                        PathToTryLabels = NNInput.PathToOutputFldr + '/REBestDet.csv.' + str(iTry)
+                    else:
+                        PathToTryLabels = NNInput.PathToOutputFldr + '/REBestDet.csv.' + str(Ang)
+                    yPredTry = T.cast(yPredTry, 'float64')
+                    yPredTry = yPredTry.eval()
+                    yPredTry = InverseTransformation(NNInput, yPredTry, ySetTryDiat.get_value())
+                    ySetTry = T.cast(ySetTry, 'float64')
+                    ySetTry = ySetTry.eval()
+                    ySetTry = InverseTransformation(NNInput, ySetTry, ySetTryDiat.get_value())
+                    save_to_plot(PathToTryLabels, 'Evaluated', numpy.concatenate((RSetTry.get_value(), ySetTry, yPredTry), axis=1))
+        
+
+        TrainEpochVec = numpy.append(TrainEpochVec, iEpoch)
 
 
     #############################################################################################################
@@ -477,7 +425,7 @@ def sgd_optimization(NNInput):
     error_Test  = ySetTest - yPredTest
     plot_error(NNInput, error_Test, 'Test')
 
-    plot_set(NNInput, RSetTrain.get_value(), ySetTrain, RSetValid.get_value(), ySetValid, RSetTest.get_value(), ySetTest)
+    plot_set(NNInput, RSetTrain.get_value(), ySetTrain, RSetValid.get_value(), ySetValid)#, RSetTest.get_value(), ySetTest)
 
 
     yPredOrig   = lasagne.layers.get_output(Layers[-1], inputs=xDataOrig) 
@@ -487,7 +435,7 @@ def sgd_optimization(NNInput):
     plot_scatter(NNInput, yPredOrig, yDataOrig)
     #plot_overall_error(NNInput, yPredOrig, yDataOrig)
 
-    #plot_history(NNInput, TrainEpochVec, Train, ValidEpochVec, Valid)
+    plot_history(NNInput, TrainEpochVec, TrainErrorVec, ValidErrorVec, TestEpochVec, TestErrorVec)
 
 
     tEnd = timeit.default_timer()
@@ -498,6 +446,7 @@ def sgd_optimization(NNInput):
     #############################################################################################################
     ### COMPUTING CUT PLOTS
     #compute_cuts(NNInput, NNInput.AnglesCuts, NNInput.RCuts, Layers, G_MEAN, G_SD)
+
 
 
 def evaluate_model(NNInput):
@@ -568,10 +517,13 @@ def evaluate_model(NNInput):
 ######################################################################################################################################
 if __name__ == '__main__':
 
-    if not os.path.exists(NNInput.PathToOutputFldr):
-        os.makedirs(NNInput.PathToOutputFldr)
-
-    if (NNInput.TrainFlg):
-        sgd_optimization(NNInput)
+    if ('--help' in sys.argv) or ('-h' in sys.argv):
+        print("Neural Network for Potential Energy Surface Fitting Using Lasagne.")
     else:
-        evaluate_model(NNInput)
+        if not os.path.exists(NNInput.PathToOutputFldr):
+            os.makedirs(NNInput.PathToOutputFldr)
+
+        if (NNInput.TrainFlg):
+            sgd_optimization(NNInput)
+        else:
+            evaluate_model(NNInput)

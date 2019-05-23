@@ -15,7 +15,7 @@ import BondOrder
 import PIP
 
 
-def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
+def create_nn(NNInput, Input, Data):
 
     print('\n    Neural Network Shape: ', NNInput.NLayers, '\n')
 
@@ -174,7 +174,7 @@ def create_nn(NNInput, Input, Data, G_MEAN, G_SD):
 
         iLayer=0;        InputL     = lasagne.layers.InputLayer((NNInput.NMiniBatch, NNInput.NLayers[iLayer]),  input_var=Input,                       name=NNInput.LayersName[iLayer])
         iLayer=iLayer+1; BOL        =           BondOrder_Layer(InputL, Lambda=Lambda, re=re,                                                          name=NNInput.LayersName[iLayer])   
-        iLayer=iLayer+1; PIPL       =                 PIP_Layer(BOL,    G_MEAN=G_MEAN, G_SD=G_SD,                                                      name=NNInput.LayersName[iLayer])
+        iLayer=iLayer+1; PIPL       =                 PIP_Layer(BOL,                                                                                   name=NNInput.LayersName[iLayer])
         iLayer=iLayer+1; HL1        = lasagne.layers.DenseLayer(PIPL,   num_units=NNInput.NLayers[iLayer],      nonlinearity=NNInput.ActFun[iLayer-1], name=NNInput.LayersName[iLayer], W=W1, b=b1)
         iLayer=iLayer+1; HL2        = lasagne.layers.DenseLayer(HL1,    num_units=NNInput.NLayers[iLayer],      nonlinearity=NNInput.ActFun[iLayer-1], name=NNInput.LayersName[iLayer], W=W2, b=b2)
         iLayer=iLayer+1; OutputL    = lasagne.layers.DenseLayer(HL2,    num_units=NNInput.NLayers[iLayer],      nonlinearity=NNInput.ActFun[iLayer-1], name=NNInput.LayersName[iLayer], W=W3, b=b3)

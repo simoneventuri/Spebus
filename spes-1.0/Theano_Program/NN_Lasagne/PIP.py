@@ -52,10 +52,8 @@ def PIP_A2B(NNInput, R, LambdaVec):
 
 class PIP_A3_Layer(lasagne.layers.Layer):
 
-    def __init__(self, incoming, G_MEAN, G_SD, **kwargs):
+    def __init__(self, incoming, **kwargs):
         super(PIP_A3_Layer, self).__init__(incoming,  **kwargs)
-        self.G_MEAN = G_MEAN
-        self.G_SD   = G_SD
 
     def get_output_for(self, incoming, **kwargs):
 
@@ -71,9 +69,9 @@ class PIP_A3_Layer(lasagne.layers.Layer):
         # G4  = GNo**6 - (p0**6 + p1**6 + p2**6)
         # G5  = GNo**7 - (p0**7 + p1**7 + p2**7)
 
-        G0 = ( p0*p1 + p1*p2 + p0*p2                                                          - self.G_MEAN[0] ) / self.G_SD[0]
-        G1 = ( p0*p1*p2                                                                       - self.G_MEAN[1] ) / self.G_SD[1]
-        G2 = ( p0**2*p1    + p0*p1**2    + p2**2*p1    + p2*p1**2    + p0**2*p2    + p0*p2**2 - self.G_MEAN[2] ) / self.G_SD[2]
+        G0 =   p0*p1 + p1*p2 + p0*p2                                                          
+        G1 =   p0*p1*p2                                                                       
+        G2 =   p0**2*p1    + p0*p1**2    + p2**2*p1    + p2*p1**2    + p0**2*p2    + p0*p2**2
         G3 =   p0**3*p1    + p0*p1**3    + p2**3*p1    + p2*p1**3    + p0**3*p2    + p0*p2**3
         G4 =   p0**2*p1*p2 + p0*p1**2*p2 + p0*p1*p2**2
         G5 =   p0**2*p1**2 + p2**2*p1**2 + p0**2*p2**2

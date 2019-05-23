@@ -77,6 +77,8 @@ class NNInput(object):
     NPatience              = 1000000   
     NDeltaPatience         = 2        
     ImpThold               = 0.995    
+    NoiseFlg               = 0
+    NoiseSigma             = 0.01
 
     Method                 = 'adadelta'   # nesterov, rmsprop, adamax, amsgrad, adadelta
     LearningRate           = 1.0
@@ -85,7 +87,7 @@ class NNInput(object):
     RMSProp                = [0.85, 0.1]
     kWeightDecay           = [1.e-100, 1.e-100]
 
-    LossFunction           = 'squared_error' # squared_error, normalized_squared_error, huber_loss, weighted_squared_error
+    LossFunction           = 'mean_squared_logarithmic_error' # squared_error, normalized_squared_error, huber_loss, weighted_squared_error
     OutputExpon            = 0.0
     Power                  = 5.0
     Shift                  = 7.27216
@@ -161,7 +163,9 @@ class NNInput(object):
                  BiasesFlg, 
                  DiatPot_FunPrint,
                  NOrd,
-                 AbscissaConverter):
+                 AbscissaConverter, 
+                 NoiseFlg, 
+                 NoiseSigma):
             
             self.Model                  = Model
             self.System                 = Sytem
@@ -216,3 +220,5 @@ class NNInput(object):
             self.DiatPot_FunPrint       = DiatPot_FunPrint
             self.NOrd                   = NOrd
             self.AbscissaConverter      = AbscissaConverter
+            self.NoiseFlg               = NoiseFlg 
+            self.NoiseSigma             = NoiseSigma

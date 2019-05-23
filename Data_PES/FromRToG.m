@@ -21,7 +21,7 @@ for iPES = 1:PESs
   iPES
 
   %ReadDataFldr         = strcat(PathToCGQCT,'/run_N3_NASA/Test/PlotPES/PES_',num2str(iPES),'/')
-  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_PES2/Test/PlotPES/PES_',num2str(iPES),'/')
+  ReadDataFldr         = strcat(PathToCGQCT,'/run_O3_PES9/Test/PlotPES/PES_',num2str(iPES),'/')
   WriteDataFldr        = strcat(PathToSPES, '/Temp/PES_', num2str(iPES), '/')
   [status, msg, msgID] = mkdir(WriteDataFldr)
 

@@ -1,7 +1,7 @@
 %% LOADING LABELED DATA
 function [NData, RData, EData, EFitted] = ReadData()
 
-  global RFile TestFileName AbscissaConverter Network_Folder alphaPlot DataShift
+  global RFile AbscissaConverter Network_Folder alphaPlot DiatMin
   
   filename = strcat(RFile,'/R.csv')
   delimiter = ',';
@@ -48,7 +48,8 @@ function [NData, RData, EData, EFitted] = ReadData()
   clearvars filename delimiter startRow formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
   RData = [R1, R2, R3] .* AbscissaConverter;
   
-  filename = strcat(RFile, '/EOrig.csv');
+  %filename = strcat(RFile, '/EOrig.csv');
+  filename = strcat(RFile, '/EFitted.csv');
   delimiter = ' ';
   startRow = 2;
   formatSpec = '%s%[^\n\r]';
@@ -82,7 +83,7 @@ function [NData, RData, EData, EFitted] = ReadData()
     catch me
     end
   end
-  EData = cell2mat(raw(:, 1));
+  EData = cell2mat(raw(:, 1)) - DiatMin;
   clearvars filename delimiter startRow formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
  
   NData =size(EData,1);
@@ -95,7 +96,7 @@ function [NData, RData, EData, EFitted] = ReadData()
   fileID = fopen(filename,'r');
   dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'HeaderLines' ,startRow-1, 'ReturnOnError', false, 'EndOfLine', '\r\n');
   fclose(fileID);
-  EFitted = dataArray{:, 1};
+  EFitted = dataArray{:, 1} - DiatMin;
   clearvars filename delimiter startRow formatSpec fileID dataArray ans;
   
   
