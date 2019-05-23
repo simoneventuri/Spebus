@@ -13,7 +13,7 @@ class NNInput(object):
     ReadIniParamsFlg = False
     SaveInference    = False
 
-    Machine = 'MAC'
+    Machine = 'ENTROPY'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
         NStepsADVI             = 500

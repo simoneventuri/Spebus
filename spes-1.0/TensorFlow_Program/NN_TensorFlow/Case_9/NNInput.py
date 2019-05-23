@@ -10,7 +10,7 @@ class NNInput(object):
     TryNNFlg               = 0
     WriteFinalFlg          = 1         # Int Flag for Writing Parameters; =0: only at the end; =1: only .npz format at each improved iter; =2 .npz and .csv at each improved iter
 
-    Machine = 'MAC'
+    Machine = 'ENTROPY'
     if (Machine == 'MAC'):
         PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
     elif (Machine == 'ENTROPY'):

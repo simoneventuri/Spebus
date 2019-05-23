@@ -66,7 +66,7 @@ def load_data(NNInput):
     NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
     NTest        = NTot - (NTrainValid)
 
-    PathToLabels                  = NNInput.PathToDataFldr + '/E_10000Points.csv'
+    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_10000Points.csv'
     yDataOrig                     = load_labels(PathToLabels)
     yDataOrig                     = numpy.squeeze(yDataOrig)
     yDataDiatOrig, dyDataDiatOrig = V_Diat_MAT(NNInput, RData)

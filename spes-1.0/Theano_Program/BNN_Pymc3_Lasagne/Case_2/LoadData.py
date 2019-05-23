@@ -116,7 +116,7 @@ def load_data(NNInput):
     # else:
     #     yData = load_labels(NNInput.PathToLabels)
 
-    PathToLabels                  = NNInput.PathToDataFldr + '/EOrig_5000Points.csv'
+    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_5000Points.csv'
     yDataOrig                     = load_labels(PathToLabels)
     yDataDiatOrig, dyDataDiatOrig = V_Diat_MAT(NNInput, RDataOrig)
     yDataTriatOrig                = yDataOrig + 0.0 #- yDataDiatOrig
