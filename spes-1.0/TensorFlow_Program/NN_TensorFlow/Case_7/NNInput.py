@@ -39,10 +39,10 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_TESTS_Det/Case_7/TensorFlow/'
-        PathToWeightFldr       = PathToSPES + '/../Output_TESTS_Det/Case_7/TensorFlow/'
-        CheckpointFilePath     = PathToSPES + '/../Output_TESTS_Det/Training_7/cp.ckpt'    
-        CheckpointFldr         = PathToSPES + '/../Output_TESTS_Det/Training_7/'    
+        PathToOutputFldr       = PathToSPES + '/../Output_TESTS/Case_7/TensorFlow/'
+        PathToWeightFldr       = PathToSPES + '/../Output_TESTS/Case_7/TensorFlow/'
+        CheckpointFilePath     = PathToSPES + '/../Output_TESTS/Training_7/cp.ckpt'    
+        CheckpointFldr         = PathToSPES + '/../Output_TESTS/Training_7/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]

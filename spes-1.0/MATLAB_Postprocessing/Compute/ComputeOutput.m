@@ -82,7 +82,7 @@ function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2
   end 
     
   if (MultErrorFlg) 
-    %EPred = exp(EPred);
+    EPred = exp(EPred);
     EPred = EPred - PreLogShift;
   end
   if (OnlyTriatFlg)

@@ -1,19 +1,50 @@
-function [iFigure] = PlotCuts(iFigure, G_MEAN, G_SD, Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det)
+function [iFigure] = PlotCuts(iFigure, RCut, ECut, EFittedCut, NPoitsVec, RCutPred, ECutPred)
 
-  global alphaVec RCutsVec  RStart REnd NPoints 
+  global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr
+
+  global alphaCutsVec RCutsVec NSamples RStart REnd NPoints NN_Folder GP_Folder PES_Folder NSigmaInt
+  
+  for iCut = 1:length(alphaCutsVec)
+
+    fig = figure(iFigure);
     
-  R3      = linspace(RStart, REnd, NPoints)';
-  for iCut   = 1:length(alphaVec)
-     R1      = R3.*0.0 + RCutsVec(iCut);
-     alpha   = alphaVec(iCut);
-     R2      = sqrt( R1.^2 + R3.^2 - 2.d0.*R1.*R3.*cos(alpha/180.d0*pi) );
-     R       = [R1, R2, R3];
-     [EPred] = ComputeOutput(R, G_MEAN, G_SD, Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det);
-     
-     figure(iFigure);
-     plot(R1, EPred,'Color',[238,238,238]./256,'LineWidth',0.5);
-     hold on
-     iFigure = iFigure + 1;
+    sz  = ones(NPoitsVec(iCut),1).*70;
+    clr = repmat([0.0, 0.0, 0.0],[NPoitsVec(iCut),1]);
+    h1=scatter(RCut(iCut,1:NPoitsVec(iCut),1),ECut(iCut,1:NPoitsVec(iCut)),sz,clr,'o','filled');
+    hold on
+
+    sz  = ones(NPoitsVec(iCut),1).*60;
+    clr = repmat(GreenClr, [NPoitsVec(iCut),1]);
+    h2=scatter(RCut(iCut,1:NPoitsVec(iCut),1),EFittedCut(iCut,1:NPoitsVec(iCut)),sz,clr,'o','filled');
+    
+    Temp1 = squeeze(RCutPred(iCut,:,1));
+    Temp2 = squeeze(ECutPred(iCut,:));
+    h3=plot(Temp1, Temp2, 'Color', RedClr, 'linewidth',1);
+    
+    clab = legend([h1,h2,h3],{'Data Points','Fitted Points','NN Prediction'});
+    clab.Interpreter = 'latex';
+    set(clab,'FontSize',LegendFontSz,'FontName',LegendFontNm,'Interpreter','latex','Location','Best');
+    %legend boxoff
+    xlab = xlabel('R [a_0]');
+    %xlab.Interpreter = 'latex';
+    ylab = ylabel('E [eV]');
+    %ylab.Interpreter = 'latex';
+    %set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out');
+    set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out','TickLabelInterpreter', 'latex');
+    if SaveFigs == 1
+       FolderPath = strcat(FigDirPath);
+       [status,msg,msgID] = mkdir(FolderPath);
+       FileName   = strcat(FolderPath, 'Cut', num2str(iCut) );
+       export_fig(FileName, '-pdf')
+       close
+    elseif SaveFigs == 2
+       FolderPath = strcat(FigDirPath);
+       [status,msg,msgID] = mkdir(FolderPath);
+       FileName   = strcat(FolderPath, 'Cut', num2str(iCut), '.fig' );
+       saveas(fig,FileName);
+    end    
+    iFigure = iFigure + 1; 
+    
   end  
   
 end

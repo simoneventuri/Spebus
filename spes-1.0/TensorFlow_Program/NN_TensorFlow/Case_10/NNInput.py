@@ -26,7 +26,7 @@ class NNInput(object):
     iPES                   = '9'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
-    PreLogShift            = +1.0
+    PreLogShift            = -3.5
     PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
 
     Model                  = 'ModPIP'
@@ -39,10 +39,10 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_TESTS/Case_9/TensorFlow/'
-        PathToWeightFldr       = PathToSPES + '/../Output_TESTS/Case_9/TensorFlow/'
-        CheckpointFilePath     = PathToSPES + '/../Output_TESTS/Training_9/cp.ckpt'    
-        CheckpointFldr         = PathToSPES + '/../Output_TESTS/Training_9/'    
+        PathToOutputFldr       = PathToSPES + '/../Output_TESTS/Case_10/TensorFlow/'
+        PathToWeightFldr       = PathToSPES + '/../Output_TESTS/Case_10/TensorFlow/'
+        CheckpointFilePath     = PathToSPES + '/../Output_TESTS/Training_10/cp.ckpt'    
+        CheckpointFldr         = PathToSPES + '/../Output_TESTS/Training_10/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]

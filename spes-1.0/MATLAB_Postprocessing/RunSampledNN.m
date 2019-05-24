@@ -2,77 +2,91 @@ close all
 clear all
 clc
 
-% N2 Min LeRoy @ 2.073808 (V=-9.8992982); N2 Min LeRoy @ 2.088828 (V=-9.3437497); difference in Minima 0.555545
+%% Parameters for Plots
+global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr iFigure
 
-global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples iFigure ResultsFolder RFile SaveSampledOutputFlg ...
-       alphaVec RCutsVec TestFileName NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun NetworkType NOrd System ...
-       ShiftScatter AbscissaConverter alphaPlot DiatMin PIPFun RPlotFile
+AxisFontSz   = 25;
+AxisFontNm   = 'Arial';
+AxisLabelSz  = 25;
+AxisLabelNm  = 'Arial';
+LegendFontSz = 25;
+LegendFontNm = 'Arial';
+SaveFigs     = 2
+RedClr       = [190, 35, 30]./256
+GreenClr     = [0.0, 0.498, 0.0]
+iFigure      = 1;
+
+
+%% Variables for Postprocessing 
+global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples ResultsFolder RFile SaveSampledOutputFlg ...
+       alphaCutsVec RCutsVec TestFileName NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun ... 
+       NetworkType NOrd System ShiftScatter AbscissaConverter alphaPlot DiatMin PIPFun RPlotFile ComputePlot ComputeScatter ComputeCut ...
+       ShiftForError NPlots
      
-System               = 'O3'    
-AbscissaConverter    = 1.0;%0.529177
+     
+System            = 'O3'    
+MultErrorFlg      = true
+OnlyTriatFlg      = true
+BondOrderFun      = 'MorseFun'
+PIPFun            = 'Simone'
+NetworkType       = 'NN'
+  NHL                  = [6,10,10,1];
+  %NOrd                 = 10
+PreLogShift       = +2
 
-MultErrorFlg         = true
-OnlyTriatFlg         = true
+
+AbscissaConverter = 1.0;%0.529177
+RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
+Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/Case_3/TensorFlow/'                                                  % Where to Find Parameters
+RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
   
-BondOrderFun         = 'MorseFun'
-PIPFun               = 'Simone'
-NetworkType          = 'NN'
-  %NOrd               = 10
-  NHL                  = [6,30,20,1];
   
-iFigure              = 1;
-SaveSampledOutputFlg = true
+UseSamplesFlg     = 3 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin Hypercube Samples; =2: Reads Samples from Pymc3; =3: Max Posterior from Pymc3's Posteriors.
+  StartSample          = 1
+  FinalSample          = 1
+  SaveSampledOutputFlg = false
+  
 
+ComputeScatter    = true  
+  ShiftForError        = 26.3*0.04336411530877
+  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0]; %[4.336, 8.673, 21.68, 43.364, 100.0]
 
-if strcmp(System,'N3')
-  RFile                = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/N3/Triat_David/PES_1/'
-  TestFileName         = 'RE.csv.120'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_10_10_Triat/N3_1/'
-  %Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIPPol_Determ_13_Triat/N3_1/'
-  %alphaVec             = [110.0,     170.0,    60.0,     116.75]
-  %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
-  alphaPlot            = [60.0, 120.0, 180.0]
-  alphaVec             = [60.0, 120.0, 180.0]
-  RCutsVec             = [2.26767] * AbscissaConverter
-  RMin                 = 2.073808
-  ShiftScatter         = 0.0;
-  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 30.0];
-  PreLogShift          = 1.0
-elseif strcmp(System,'O3')
-  RFile                = '/Users/sventuri/GoogleDrive/O3_PES9/AbInitioPoints/'
-  RPlotFile            = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'
-  TestFileName         = 'RE.csv.60'
-  %Network_Folder       = '/Users/sventuri/GoogleDrive/O3_PES9/NeuralNetwork[10,10]/Calibrated_AbInitio/'
-  Network_Folder       = '/Users/sventuri/WORKSPACE/SPES/Output_MAC/ModPIP_Determ_30_20_Triat/O3_9_3020_m35_LogError_0005Noise/'
-  %alphaVec             = [110.0,     170.0,    60.0,     116.75]
-  %RCutsVec             = [2.26767, 2.26767, 2.64562, 2.28203327]
+  
+ComputePlot       = true
   alphaPlot            = [[35:5:175],[106.75:10:126.75]]
-  alphaVec             = [60,110,116.75,170]
+  RStart               = 1.5
+  REnd                 = 10.0
+  NPoints              = 150
+
+  
+ComputeCut       = true
+  alphaCutsVec         = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
-  RMin                 = 2.2820248
-  ShiftScatter         = 26.3*0.04336411530877
-  %EGroupsVec           = [4.336, 8.673, 21.68, 43.364, 200.0];
-  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0];
-  PreLogShift          = -3.5
-end
+%%
 
-NCuts                = length(RCutsVec)
-RStart               = 1.5
-REnd                 = 10.0
-NPoints              = 150
 
+%% Computing Remeaing Variables
+NSamples = FinalSample-StartSample+1;
 
 if strcmp(System,'N3')
+  RMin           = 2.073808;
   [DiatMin, dE1] = N2_LeRoy(RMin);
-  %[DiatMin, dE1] = N2_MRCI(RMin)
+  [DiatMax, dE1] = N2_LeRoy(100.0);
 elseif strcmp(System,'O3')
+  RMin           = 2.2820248;
   [DiatMin, dE1] = O2_UMN(RMin);
+  [DiatMax, dE1] = O2_UMN(100.0);
 end
+
+FigDirPath = strcat(Network_Folder, '/Figs/')
+%%
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOADING DATA
 [NData, RData, EData, EFitted] = ReadData();
+EData                          = EData;
+EFitted                        = EFitted;
 [EDataDiat]                    = ComputeDiat(RData);
 RRData                         = sqrt(RData(:,1).^2+RData(:,2).^2+RData(:,3).^2);
 [Val,Idx]                      = max(RRData);
@@ -83,27 +97,27 @@ NPlots = length(alphaPlot);
 for iPlot=1:NPlots
   RTemp              = squeeze(RPlot(iPlot,:,:));
   [EPlotDiat]        = ComputeDiat(RTemp);
-  EDataPlot(iPlot,:) = EDataPlot(iPlot,:);% + EPlotDiat';
+  EDataPlot(iPlot,:) = EDataPlot(iPlot,:);% + EPlotDiat' - DiatMin;
   clear RTemp EPlotDiat
 end
 
-% NCuts  = length(RCutsVec)
-% NPtCut = 1000;
-% [RCut, ECut, EFittedCut, NPoitsVec, RCutPred] = ReadCutData(NPtCut);
-% for iCut=1:NCuts
-%   RTemp                              = squeeze(RCut(iCut,1:NPoitsVec(iCut),1:3));
-%   [ECutDiat]                         = ComputeDiat(RTemp);
-%   ECut(iCut,1:NPoitsVec(iCut))       = ECut(iCut,1:NPoitsVec(iCut))       + ECutDiat';
-%   EFittedCut(iCut,1:NPoitsVec(iCut)) = EFittedCut(iCut,1:NPoitsVec(iCut)) + ECutDiat';
-%   clear RTemp ECutDiat
-% end
+NCuts  = length(RCutsVec)
+NPtCut = 1000;
+[RCut, ECut, EFittedCut, NPoitsVec, RCutPred] = ReadCutData(RData, EData, EFitted, NPtCut);
+for iCut=1:NCuts
+  RTemp                              = squeeze(RCut(iCut,1:NPoitsVec(iCut),1:3));
+  [ECutDiat]                         = ComputeDiat(RTemp);
+  ECut(iCut,1:NPoitsVec(iCut))       = ECut(iCut,1:NPoitsVec(iCut))       + ECutDiat';
+  EFittedCut(iCut,1:NPoitsVec(iCut)) = EFittedCut(iCut,1:NPoitsVec(iCut)) + ECutDiat';
+  clear RTemp ECutDiat
+end
 
 
 %% LOADING PIP'S PARAMETERS
 %[G_MEAN, G_SD] = ReadScales();
+G_MEAN=0.0;G_SD=0.0;
 
-G_MEAN=[0,0,0];
-G_SD=[1,1,1];
+
 %% LOADING NN's PARAMETERS
 if strcmp(NetworkType,'GP')
   [Lambda, re, Exp1, Exp2, Exp3, Exp4, l1, l2, Amp, SigmaNoise] = ReadParametersGP();
@@ -116,19 +130,60 @@ end
 % AngVec = [60.0,110,116.75,170];
 % ComputePESDerivatives(AngVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0)
 
-%% PLOT CUTS
-% [iFigure] = PlotCuts(iFigure, G_MEAN, G_SD, Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det)
+
+%% ADDING SHIFTS
+RMaxVec      = [RMin, 100.0, 100.0];
+[PredAsympt] = ComputeOutput(RMaxVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+% PredAsympt   = 0.0;
+
+
+%% COMPUTING OUTPUT FOR SCATTER
+[EDataPred] = ComputeOutput(RData, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
+
+
+%% COMPUTING OUTPUT @ 3D VIEWS DATA
+if (ComputePlot)
+  EPredPlot = zeros(NPlots,size(RPlot,2));
+  for iPlot=1:NPlots
+    [EPredPlot(iPlot,:)] = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
+    clear EPred
+  end
+end
+%%
+
+
+%% COMPUTING OUTPUT @ CUT DATA
+if (ComputeCut)
+  ECutPred = zeros(NCuts,NPtCut);
+  for iCut=1:NCuts
+    [ECutPred(iCut,:)] = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
+    clear EPred
+  end
+end
+
 
 %% PLOT scatter PLOTS
-[iFigure] = PlotScatter(iFigure, RData, EData, EDataDiat, EFitted, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+[iFigure] = PlotScatter(iFigure, RData, EData, EDataDiat, EFitted, EDataPred);
 
-figure(100)
-PlotDiatomicPot(100, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
 
-%% ADDING DIATOMIC 
-for iPlot=1:length(alphaPlot)
-  ComputeOutputAtPlot(iPlot, squeeze(RPlot(iPlot,:,:)), EDataPlot(iPlot,:), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+%% WRITING 3D VIEWS
+if (ComputePlot)
+  WriteOutput(RPlot, EDataPlot, EPredPlot);
 end
+%%
+
+  
+%% PLOTTING CUTS
+if (ComputeCut)
+  %ECutPred  = 0.0;
+  [iFigure] = PlotCuts(iFigure, RCut, ECut, EFittedCut, NPoitsVec, RCutPred, ECutPred);
+end
+%%
+
+
+
+%figure(100)
+%PlotDiatomicPot(100, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
 
 
 % R = linspace(1.5,6.0,3000);
