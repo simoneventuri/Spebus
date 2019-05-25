@@ -32,12 +32,12 @@ PIPFun            = 'Simone'
 NetworkType       = 'NN'
   NHL                  = [6,10,10,1];
   %NOrd                 = 10
-PreLogShift       = +2
+PreLogShift       = +1.0
 
 
 AbscissaConverter = 1.0;%0.529177
 RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/Case_3/TensorFlow/'                                                  % Where to Find Parameters
+Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS_Det/Case_10/TensorFlow/'                                                  % Where to Find Parameters
 RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
   
   
@@ -49,7 +49,7 @@ UseSamplesFlg     = 3 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin 
 
 ComputeScatter    = true  
   ShiftForError        = 26.3*0.04336411530877
-  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0]; %[4.336, 8.673, 21.68, 43.364, 100.0]
+  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0, 1000.0]; %[4.336, 8.673, 21.68, 43.364, 100.0]
 
   
 ComputePlot       = true
@@ -85,7 +85,7 @@ FigDirPath = strcat(Network_Folder, '/Figs/')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOADING DATA
 [NData, RData, EData, EFitted] = ReadData();
-EData                          = EData;
+EData                          = EData + DiatMin;
 EFitted                        = EFitted;
 [EDataDiat]                    = ComputeDiat(RData);
 RRData                         = sqrt(RData(:,1).^2+RData(:,2).^2+RData(:,3).^2);
@@ -133,20 +133,21 @@ end
 
 %% ADDING SHIFTS
 RMaxVec      = [RMin, 100.0, 100.0];
-[PredAsympt] = ComputeOutput(RMaxVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+[Temp, PredAsympt] = ComputeOutput(RMaxVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
 % PredAsympt   = 0.0;
 
 
 %% COMPUTING OUTPUT FOR SCATTER
-[EDataPred] = ComputeOutput(RData, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
-
+[EDataPred, EDataPredTot] = ComputeOutput(RData, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+EDataPredTot              = EDataPredTot - PredAsympt;
 
 %% COMPUTING OUTPUT @ 3D VIEWS DATA
 if (ComputePlot)
   EPredPlot = zeros(NPlots,size(RPlot,2));
   for iPlot=1:NPlots
-    [EPredPlot(iPlot,:)] = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
+    [Temp, EPredPlot(iPlot,:)] = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
     clear EPred
+    EPredPlot(iPlot,:) = EPredPlot(iPlot,:) - PredAsympt;
   end
 end
 %%
@@ -156,14 +157,15 @@ end
 if (ComputeCut)
   ECutPred = zeros(NCuts,NPtCut);
   for iCut=1:NCuts
-    [ECutPred(iCut,:)] = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0) - PredAsympt;
+    [Temp, ECutPred(iCut,:)] = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
     clear EPred
+    ECutPred(iCut,:) = ECutPred(iCut,:) - PredAsympt;
   end
 end
 
 
 %% PLOT scatter PLOTS
-[iFigure] = PlotScatter(iFigure, RData, EData, EDataDiat, EFitted, EDataPred);
+[iFigure] = PlotScatter(iFigure, RData, EData, EDataDiat, EFitted, EDataPred, EDataPredTot);
 
 
 %% WRITING 3D VIEWS

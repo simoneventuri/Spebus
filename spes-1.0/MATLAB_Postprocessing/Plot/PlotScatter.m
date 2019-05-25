@@ -1,4 +1,4 @@
-function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, EDataPred)
+function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, EDataPred, EDataPredTot)
   
   global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr
 
@@ -6,10 +6,10 @@ function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, EDataPre
   
   
   if (OnlyTriatFlg)
-    EData   = EData   + EDiatData;
-    EFitted = EFitted + EDiatData;
+    EDataTot   = EData   + EDiatData;
+    EFittedTot = EFitted + EDiatData;
   else
-    EData   = EData + PRedShift;
+    EDataTot   = EData + PRedShift;
   end
   NData = size(EData,1);
 
@@ -18,11 +18,11 @@ function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, EDataPre
   
   sz  = ones(NData,1).*40;
   clr = repmat(GreenClr, [NData,1]);
-  h1=scatter(EData,EFitted,sz,clr,'filled');
+  h1=scatter(EDataTot,EFittedTot,sz,clr,'filled');
   hold on
   sz  = ones(NData,1).*30;
   clr = repmat(RedClr, [NData,1]);
-  h2=scatter(EData,EDataPred,sz,clr,'filled');
+  h2=scatter(EDataTot,EDataPredTot,sz,clr,'filled');
   pbaspect([1,1,1])
   
   clab = legend([h1,h2],{'Original Fit','NN Predictions'});
@@ -51,6 +51,6 @@ function [iFigure] = Plotscatter(iFigure, R, EData, EDiatData, EFitted, EDataPre
   iFigure = iFigure + 1; 
  
   
-  [iFigure] = ComputeError(iFigure, EData, EFitted, EDataPred)
+  [iFigure] = ComputeError(iFigure, EDataTot, EFittedTot, EDataPredTot, EData, EFitted, EDataPred)
   
 end

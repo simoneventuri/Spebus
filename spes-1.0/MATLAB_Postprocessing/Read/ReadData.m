@@ -4,6 +4,8 @@ function [NData, RData, EData, EFitted] = ReadData()
   global RFile AbscissaConverter Network_Folder alphaPlot DiatMin
   
   filename = strcat(RFile,'/R.csv')
+  %filename = strcat(RFile,'/R_10000Points.csv')
+  %filename = strcat(RFile,'/R_5000Points.csv')
   delimiter = ',';
   startRow = 2;
   formatSpec = '%s%s%s%[^\n\r]';
@@ -48,8 +50,10 @@ function [NData, RData, EData, EFitted] = ReadData()
   clearvars filename delimiter startRow formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
   RData = [R1, R2, R3] .* AbscissaConverter;
   
-  %filename = strcat(RFile, '/EOrig.csv');
-  filename = strcat(RFile, '/EFitted.csv');
+  filename = strcat(RFile, '/EOrig.csv');
+  %filename = strcat(RFile, '/EFitted.csv');
+  %filename = strcat(RFile, '/EFitted_10000Points.csv');
+  %filename = strcat(RFile, '/EFitted_5000Points.csv');
   delimiter = ' ';
   startRow = 2;
   formatSpec = '%s%[^\n\r]';
@@ -88,8 +92,9 @@ function [NData, RData, EData, EFitted] = ReadData()
  
   NData =size(EData,1);
   
-  
   filename = strcat(RFile,'/EFitted.csv');
+  %filename = strcat(RFile,'/EFitted_10000Points.csv');
+  %filename = strcat(RFile,'/EFitted_5000Points.csv');
   delimiter = '';
   startRow = 2;
   formatSpec = '%f%[^\n\r]';

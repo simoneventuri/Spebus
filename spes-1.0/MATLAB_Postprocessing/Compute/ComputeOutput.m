@@ -1,4 +1,4 @@
-function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise)
+function [EPred, EPredTot] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise)
 
   global MultErrorFlg OnlyTriatFlg PreLogShift NetworkType NOrd System AbscissaConverter RMin NSigma
   
@@ -96,7 +96,7 @@ function [EPred] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2
       [E3, dE3] = O2_UMN(R(:,3)'./AbscissaConverter);
     end
     EDiat = E1 + E2 + E3;
-    EPred = EPred + EDiat;
+    EPredTot = EPred + EDiat;
   end
 
 end
