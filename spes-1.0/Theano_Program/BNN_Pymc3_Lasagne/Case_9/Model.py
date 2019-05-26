@@ -25,37 +25,37 @@ def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
 
 
         Lambda = pymc3.Uniform('Lambda', lower=0.0, upper=3.0, shape=(1,1), testval=0.5)
-        re     = pymc3.Uniform('re',     lower=0.0, upper=3.0, shape=(1,1), testval=2.0)
+        re     = pymc3.Uniform('re',     lower=1.0, upper=4.0, shape=(1,1), testval=2.0)
 
         iLayer = 2
         print('\n    1st Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1])) 
         if (NNInput.TwoLevelsFlg):
-            W1Hyper = pymc3.HalfNormal('W1Hyper', sd=2.0, testval=1.0)
+            W1Hyper = pymc3.HalfNormal('W1Hyper', sd=1.0, testval=1.0)
         else:
             W1Hyper = 5.0
         W1      = pymc3.Normal('W1', mu=0.0, sd=W1Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
-        b1      = pymc3.Normal('b1', mu=0.0, sd=10.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
+        b1      = pymc3.Normal('b1', mu=0.0, sd=2.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
         iLayer  = iLayer+1
 
         print('    2nd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
         if (NNInput.TwoLevelsFlg):
-            W2Hyper = pymc3.HalfNormal('W2Hyper', sd=2.0, testval=1.0)
+            W2Hyper = pymc3.HalfNormal('W2Hyper', sd=1.0, testval=1.0)
         else:
             W2Hyper = 5.0
         W2      = pymc3.Normal('W2', mu=0.0, sd=W2Hyper, testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
-        b2      = pymc3.Normal('b2', mu=0.0, sd=10.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
+        b2      = pymc3.Normal('b2', mu=0.0, sd=2.0,    testval=0.0, shape=NNInput.NLayers[iLayer+1])
         iLayer  = iLayer+1
 
         print('    3rd Layer of NN; size = ', NNInput.NLayers[iLayer], NNInput.NLayers[iLayer+1])
         WSD     = numpy.sqrt(2.0 / (NNInput.NLayers[iLayer] + NNInput.NLayers[iLayer+1]))
         if (NNInput.TwoLevelsFlg):
-            W3Hyper = pymc3.HalfNormal('W3Hyper', sd=2.0, testval=1.0)
+            W3Hyper = pymc3.HalfNormal('W3Hyper', sd=1.0, testval=1.0)
         else:
             W3Hyper = 5.0
         W3      = pymc3.Normal('W3', mu=0.0, sd=W3Hyper,  testval=numpy.random.normal(loc=0.0, scale=WSD, size=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1])).astype(numpy.float64), shape=(NNInput.NLayers[iLayer],NNInput.NLayers[iLayer+1]))
-        b3      = pymc3.Normal('b3', mu=0.0, sd=5.0, testval=0.0, shape=NNInput.NLayers[iLayer+1])
+        b3      = pymc3.Normal('b3', mu=0.0, sd=2.0,      testval=0.0, shape=NNInput.NLayers[iLayer+1])
 
 
         iLayer=0;        InputL     = lasagne.layers.InputLayer((None, NNInput.NLayers[iLayer]),  input_var=Input,                                     name=NNInput.LayersName[iLayer])
@@ -70,7 +70,7 @@ def construct_model(NNInput, RSetTrain, ySetTrain, Input, yObs, InitW, Initb):
         
         # Define likelihood
         #Sigma = pymc3.Lognormal('Sigma', mu=0.01,  sd=2.0, testval=10.0)
-        Sigma = pymc3.HalfNormal('Sigma',                                        sd=1.0,   testval=1.0)
+        Sigma = pymc3.HalfNormal('Sigma', sd=1.0,   testval=1.0)
         #yLike = pymc3.Normal('yLike',     mu=T.log(T.clip(yPred, 1e-08, 1.e10)), sd=Sigma, observed=numpy.log(yObs))#, total_size=NNInput.NMiniBatch
         yLike = pymc3.Normal('yLike', mu=yPred, sd=Sigma, observed=yObs)#, total_size=NNInput.NMiniBatch
         

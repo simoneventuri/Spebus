@@ -30,14 +30,14 @@ OnlyTriatFlg      = true
 BondOrderFun      = 'MorseFun'
 PIPFun            = 'Simone'
 NetworkType       = 'NN'
-  NHL                  = [6,10,10,1];
+  NHL                  = [6,30,20,1];
   %NOrd                 = 10
-PreLogShift       = +1.0
+PreLogShift       = -3.5
 
 
 AbscissaConverter = 1.0;%0.529177
 RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS_Det/Case_10/TensorFlow/'                                                  % Where to Find Parameters
+Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS_Det/Case_14/TensorFlow/'                                                  % Where to Find Parameters
 RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
   
   

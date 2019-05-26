@@ -118,9 +118,20 @@ def build_MLP_model(NNInput):
     kW1 = NNInput.kWeightDecay[0]
     kW2 = NNInput.kWeightDecay[1]
     Layer1 = MorseFun_Layer(NNInput.NLayers[2])
-    Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
-    Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
-    Layer4 = layers.Dense(units=NNInput.NLayers[5],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
+    #Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
+    #Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
+    #Layer4 = layers.Dense(units=NNInput.NLayers[5],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
+    WSD          = numpy.sqrt(2.0 / (NNInput.NLayers[3] + NNInput.NLayers[2]) ) 
+    InitializerW = tf.keras.initializers.RandomNormal(mean=0.0, stddev=WSD, seed=None)
+    Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer=InitializerW, bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l2(l=1.e-4))
+    
+    WSD          = numpy.sqrt(2.0 / (NNInput.NLayers[4] + NNInput.NLayers[3]) ) 
+    InitializerW = tf.keras.initializers.RandomNormal(mean=0.0, stddev=WSD, seed=None)
+    Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer=InitializerW, bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l2(l=1.e-4))
+    
+    WSD          = numpy.sqrt(2.0 / (NNInput.NLayers[5] + NNInput.NLayers[4]) ) 
+    InitializerW = tf.keras.initializers.RandomNormal(mean=0.0, stddev=WSD, seed=None)
+    Layer4 = layers.Dense(units=NNInput.NLayers[5], use_bias=True, kernel_initializer=InitializerW, bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l2(l=1.e-4))
     #Layer6 = layers.GaussianNoise(0.001)
 
     # RTemp = tf.Variable([[1.0, 2.0, 3.0],[4.0, 5.0, 6.0]])
