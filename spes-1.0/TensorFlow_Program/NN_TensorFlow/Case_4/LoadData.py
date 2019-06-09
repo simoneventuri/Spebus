@@ -56,17 +56,17 @@ def load_data(NNInput):
 
     ##################################################################################################################################
     # LOADING DATA
-    ##################################################################################################################################
-    PathToLabeledInput = NNInput.PathToDataFldr + '/R.csv'
+    #################################################################################################################################
+    PathToLabeledInput = NNInput.PathToDataFldr + '/R_Plus400.csv'
     RData              = load_labeled_input(PathToLabeledInput)
     RDataOrig          = RData + 0.0
 
     NTot         = RData.shape[0]
     NIn          = RData.shape[1]
-    NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
-    NTest        = NTot - (NTrainValid)
+    #NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
+    #NTest        = NTot - (NTrainValid)
 
-    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_001Noise.csv'
+    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_Plus400.csv'
     yDataOrig                     = load_labels(PathToLabels)
     yDataOrig                     = numpy.squeeze(yDataOrig)
     yDataDiatOrig, dyDataDiatOrig = V_Diat_MAT(NNInput, RData)

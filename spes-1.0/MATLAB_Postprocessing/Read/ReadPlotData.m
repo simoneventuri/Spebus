@@ -3,7 +3,7 @@ function [RPlot, EPlot] = ReadPlotData()
   global RPlotFile alphaPlot AbscissaConverter
   
   
-  filename = strcat(RPlotFile,'/PESFromGrid.csv.',num2str(floor(alphaPlot(1))));
+  filename = strcat(RPlotFile,'/PESFromGrid.csv.',num2str(floor(alphaPlot(1))))
   delimiter = ',';
   startRow = 2;
   formatSpec = '%f%f%f%f%[^\n\r]';

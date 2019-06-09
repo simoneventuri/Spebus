@@ -61,8 +61,8 @@ class NNInput(object):
         LambdaVec              = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         reVec                  = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_TESTS/Case_1/Pymc3/'
-        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/ModPIP_Determ_' + str(NHid[2]) + '_' + str(NHid[3]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToOutputFldr       = PathToSPES + '/../Output_FINAL/Case_1/Pymc3/'
+        PathToWeightFldr       = PathToSPES + '/../Output_FINAL/Case_1/Theano/'
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]

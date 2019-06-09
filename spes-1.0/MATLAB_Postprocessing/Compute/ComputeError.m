@@ -51,11 +51,11 @@ function [iFigure] = ComputeError(iFigure, EDataTot, EFittedTot, EPredTot, EData
   UME_Data_Group  =      UME_Data_Group  ./ Point_in_Group;
   UME_Pred_Group  =      UME_Pred_Group  ./ Point_in_Group;
   
-  TriatErrorFitted = EFitted-EData;
-  TriatErrorPred   = EPred-EData;
-  
-  TriatFitted_SD   = std( log(EFitted) - log(EData) );
-  TriatPred_SD     = std( log(EPred)   - log(EData) );
+%   TriatErrorFitted = EFitted-EData;
+%   TriatErrorPred   = EPred-EData;
+%   
+%   TriatFitted_SD   = std( log(EFitted) - log(EData) );
+%   TriatPred_SD     = std( log(EPred)   - log(EData) );
   
   
   FolderPath = strcat(Network_Folder,'/Errors/');
@@ -68,12 +68,12 @@ function [iFigure] = ComputeError(iFigure, EDataTot, EFittedTot, EPredTot, EData
     fprintf(fileID,'%7i,%12f,%8i,%13f,%13f,%13f,%13f\n', iGroup, EGroupsVec(iGroup), Point_in_Group(iGroup), UME_Data_Group(iGroup), UME_Pred_Group(iGroup), RMSE_Data_Group(iGroup), RMSE_Pred_Group(iGroup) );
   end
   fclose(fileID);
-  
-  filename = strcat(FolderPath,'/Triat_SD.csv');
-  fileID = fopen(filename,'w');
-  fprintf(fileID,'# Fitted SD, Predicted SD\n');
-  fprintf(fileID,'%12f,%12f\n', TriatFitted_SD, TriatPred_SD );
-  fclose(fileID);
+%   
+%   filename = strcat(FolderPath,'/Triat_SD.csv');
+%   fileID = fopen(filename,'w');
+%   fprintf(fileID,'# Fitted SD, Predicted SD\n');
+%   fprintf(fileID,'%12f,%12f\n', TriatFitted_SD, TriatPred_SD );
+%   fclose(fileID);
     
   
   fig = figure(iFigure);
@@ -142,39 +142,39 @@ function [iFigure] = ComputeError(iFigure, EDataTot, EFittedTot, EPredTot, EData
   
   
   
-  fig = figure(iFigure);
-  
-  sz  = ones(NData,1).*70;
-  clr = repmat(GreenClr,[NData,1]);
-  h1=scatter(EData,TriatErrorFitted,sz,clr,'o','filled');
-  hold on
-  
-  sz  = ones(NData,1).*60;
-  clr = repmat(RedClr,[NData,1]);
-  h2=scatter(EData,TriatErrorPred,sz,clr,'o','filled');
-  
-  %clab = legend([h1,h2,h3],{'Data Points','Fitted Points','BNN Prediction'});
-  %clab.Interpreter = 'latex';
-  %set(clab,'FontSize',LegendFontSz,'FontName',LegendFontNm,'Interpreter','latex','Location','Best');
-  %legend boxoff
-  xlab = xlabel('Data Energy');
-  %xlab.Interpreter = 'latex';
-  ylab = ylabel('UME [eV]');
-  %ylab.Interpreter = 'latex';
-  %set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out');
-  set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out','TickLabelInterpreter', 'latex');
-  if SaveFigs == 1
-     FolderPath = strcat(FigDirPath);
-     [status,msg,msgID] = mkdir(FolderPath);
-     FileName   = strcat(FolderPath, 'UME_Triat' );
-     export_fig(FileName, '-pdf')
-     close
-  elseif SaveFigs == 2
-     FolderPath = strcat(FigDirPath);
-     [status,msg,msgID] = mkdir(FolderPath);
-     FileName   = strcat(FolderPath, 'UME_Triat.fig' );
-     saveas(fig,FileName);
-  end    
-  iFigure = iFigure + 1; 
+%   fig = figure(iFigure);
+%   
+%   sz  = ones(NData,1).*70;
+%   clr = repmat(GreenClr,[NData,1]);
+%   h1=scatter(EData,TriatErrorFitted,sz,clr,'o','filled');
+%   hold on
+%   
+%   sz  = ones(NData,1).*60;
+%   clr = repmat(RedClr,[NData,1]);
+%   h2=scatter(EData,TriatErrorPred,sz,clr,'o','filled');
+%   
+%   %clab = legend([h1,h2,h3],{'Data Points','Fitted Points','BNN Prediction'});
+%   %clab.Interpreter = 'latex';
+%   %set(clab,'FontSize',LegendFontSz,'FontName',LegendFontNm,'Interpreter','latex','Location','Best');
+%   %legend boxoff
+%   xlab = xlabel('Data Energy');
+%   %xlab.Interpreter = 'latex';
+%   ylab = ylabel('UME [eV]');
+%   %ylab.Interpreter = 'latex';
+%   %set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out');
+%   set(gca,'FontSize',AxisFontSz, 'FontName',AxisFontNm,'TickDir','out','TickLabelInterpreter', 'latex');
+%   if SaveFigs == 1
+%      FolderPath = strcat(FigDirPath);
+%      [status,msg,msgID] = mkdir(FolderPath);
+%      FileName   = strcat(FolderPath, 'UME_Triat' );
+%      export_fig(FileName, '-pdf')
+%      close
+%   elseif SaveFigs == 2
+%      FolderPath = strcat(FigDirPath);
+%      [status,msg,msgID] = mkdir(FolderPath);
+%      FileName   = strcat(FolderPath, 'UME_Triat.fig' );
+%      saveas(fig,FileName);
+%   end    
+%   iFigure = iFigure + 1; 
 
 end

@@ -56,15 +56,15 @@ def load_data(NNInput):
 
     ##################################################################################################################################
     # LOADING DATA
-    ##################################################################################################################################
+    #################################################################################################################################
     PathToLabeledInput = NNInput.PathToDataFldr + '/R_5000Points.csv'
     RData              = load_labeled_input(PathToLabeledInput)
     RDataOrig          = RData + 0.0
 
     NTot         = RData.shape[0]
     NIn          = RData.shape[1]
-    NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
-    NTest        = NTot - (NTrainValid)
+    #NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
+    #NTest        = NTot - (NTrainValid)
 
     PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_5000Points.csv'
     yDataOrig                     = load_labels(PathToLabels)

@@ -1,4 +1,4 @@
-close all
+%close all
 clear all
 clc
 
@@ -14,7 +14,7 @@ LegendFontNm = 'Arial';
 SaveFigs     = 2
 RedClr       = [190, 35, 30]./256
 GreenClr     = [0.0, 0.498, 0.0]
-iFigure      = 1;
+iFigure      = 1000;
 
 
 %% Variables for Postprocessing 
@@ -30,22 +30,15 @@ OnlyTriatFlg      = true
 BondOrderFun      = 'MorseFun'
 PIPFun            = 'Simone'
 NetworkType       = 'NN'
-  NHL                  = [6,30,20,1];
+  NHL                  = [6,10,10,1];
   %NOrd                 = 10
-PreLogShift       = -3.5
-
+PreLogShift       = 1
 
 AbscissaConverter = 1.0;%0.529177
-RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS_Det/Case_14/TensorFlow/'                                                  % Where to Find Parameters
-RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
-  
-  
-UseSamplesFlg     = 3 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin Hypercube Samples; =2: Reads Samples from Pymc3; =3: Max Posterior from Pymc3's Posteriors.
-  StartSample          = 1
-  FinalSample          = 1
-  SaveSampledOutputFlg = false
-  
+RFile             = '/home/venturi/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
+Network_Folder    = '/home/venturi/WORKSPACE/SPES/Output_TESTS_Det/Case_3Bis/TensorFlow/'                                                  % Where to Find Parameters
+RPlotFile         = '/home/venturi/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
+
 
 ComputeScatter    = true  
   ShiftForError        = 26.3*0.04336411530877
@@ -85,7 +78,7 @@ FigDirPath = strcat(Network_Folder, '/Figs/')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOADING DATA
 [NData, RData, EData, EFitted] = ReadData();
-EData                          = EData + DiatMin;
+EData                          = EData;% + DiatMin;
 EFitted                        = EFitted;
 [EDataDiat]                    = ComputeDiat(RData);
 RRData                         = sqrt(RData(:,1).^2+RData(:,2).^2+RData(:,3).^2);

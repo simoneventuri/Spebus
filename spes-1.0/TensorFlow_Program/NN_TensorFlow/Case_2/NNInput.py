@@ -39,10 +39,10 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_TESTS/Case_2/TensorFlow/'
-        PathToWeightFldr       = PathToSPES + '/../Output_TESTS/Case_2/TensorFlow/'
-        CheckpointFilePath     = PathToSPES + '/../Output_TESTS/Training_2/cp.ckpt'    
-        CheckpointFldr         = PathToSPES + '/../Output_TESTS/Training_2/'    
+        PathToOutputFldr       = PathToSPES + '/../Output_FINAL/Case_2/TensorFlow/'
+        PathToWeightFldr       = PathToSPES + '/../Output_FINAL/Case_2/TensorFlow/'
+        CheckpointFilePath     = PathToSPES + '/../Output_FINAL/Training_2/cp.ckpt'    
+        CheckpointFldr         = PathToSPES + '/../Output_FINAL/Training_2/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -66,12 +66,12 @@ class NNInput(object):
     GenDataFlg             = False
     NIn                    = 3
     NOut                   = 1
-    PercTrain              = 1.0
+    #PercTrain              = 1.0
     PercValid              = 0.2
     RandomizeDataFlg       = True
     NormalizeDataFlg       = False
 
-    NEpoch                 = 20000
+    NEpoch                 = 30000
     NMiniBatch             = 30
     NPatience              = 1000   
     NDeltaPatience         = 2        
@@ -82,7 +82,7 @@ class NNInput(object):
     kMomentum              = 0.9
     EarlyStoppingFlg       = False
     RMSProp                = [0.85, 0.1]
-    kWeightDecay           = [1.e-100, 1.e-100]
+    kWeightDecay           = [0.0, 1.e-5]
 
     LossFunction           = 'mse' # mean_squared_logarithmic_error, mse
     OutputExpon            = 0.0

@@ -3,7 +3,7 @@ clear all
 clc
 
 %% Parameters for Plots
-global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr iFigure
+global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr iFigure CGQCTFolder
 
 AxisFontSz   = 25;
 AxisFontNm   = 'Arial';
@@ -21,7 +21,9 @@ iFigure      = 1;
 global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample FinalSample NSamples RFile SaveSampledOutputFlg ...
        alphaCutsVec RCutsVec NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun ...
        NetworkType NOrd System AbscissaConverter MomentaFileName NN_Folder ComputeCu NSigmaInt alphaPlot ...
-       NPlots TestFileName DiatMin DiatMax CheckPostVec ShiftForError PIPFun RPlotFile ComputePlot ComputeScatter ComputeCut
+       NPlots TestFileName DiatMin DiatMax CheckPostVec ShiftForError PIPFun RPlotFile ComputePlot ComputeScatter ComputeCut ...
+       OutputFolder
+   
      
 System            = 'O3'    
 MultErrorFlg      = true
@@ -29,17 +31,18 @@ OnlyTriatFlg      = true
 BondOrderFun      = 'MorseFun'
 PIPFun            = 'Simone'
 NetworkType       = 'NN'
-  NHL                  = [6,10,10,1];
+  NHL                  = [6,20,10,1];
   %NOrd                 = 10
-PreLogShift       = +2
+PreLogShift       = 0.0
 
 
 AbscissaConverter = 1.0;%0.529177
-RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                                                    % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/Case_3/O3_9/'                                                        % Where to Find Parameters
-RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                                       % Where to Find PESFromGrid.csv.* and RECut.csv.*
+RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_1/'                                     % Where to Find R.csv, EOrig.csv and EFitted.csv
+Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES1/Case_20_3/Pymc3/'                                   % Where to Find Parameters
+RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES1/Vargas/PlotPES/PES_1/'                                        % Where to Find PESFromGrid.csv.* and RECut.csv.*
+OutputFolder      = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES1/Case_20_3/Pymc3/'  
   
-  
+
 UseSamplesFlg     = 3 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin Hypercube Samples; =2: Reads Samples from Pymc3; =3: Max Posterior from Pymc3's Posteriors.
   StartSample          = 1
   FinalSample          = 1
@@ -50,13 +53,13 @@ ComputeScatter    = true
   NSigmaInt            = 3.0
   CheckPostVec         = []%[100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
   ShiftForError        = 26.3*0.04336411530877
-  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0]; %[4.336, 8.673, 21.68, 43.364, 100.0]
+  EGroupsVec           = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0, 1000.0]; % [4.336, 8.673, 21.68, 43.364, 100.0]%
 
   
-ComputePlot       = true
+ComputePlot       = false
   alphaPlot            = [[35:5:175],[106.75:10:126.75]]
   RStart               = 1.5
-  REnd                 = 10.0
+  REnd                 = 8.0
   NPoints              = 150
 
   
@@ -86,7 +89,7 @@ FigDirPath = strcat(Network_Folder, '/Figs/')
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% LOADING DATA
 [NData, RData, EData, EFitted] = ReadData();
-EData                          = EData;
+EData                          = EData + DiatMin;
 EFitted                        = EFitted;
 [EDataDiat]                    = ComputeDiat(RData);
 RRData                         = sqrt(RData(:,1).^2+RData(:,2).^2+RData(:,3).^2);
@@ -126,7 +129,6 @@ if (UseSamplesFlg < 2) || (UseSamplesFlg == 3)
   NSamplesLHS  = FinalSample-StartSample+1;
   [LHSSamples, Lambda_LHS, re_LHS, W1_LHS, W2_LHS, W3_LHS, b1_LHS, b2_LHS, b3_LHS, Sigma_LHS] = ComputeLHS(NSamplesLHS, Lambda_MEAN, re_MEAN, W1_MEAN, W2_MEAN, W3_MEAN, b1_MEAN, b2_MEAN, b3_MEAN, Sigma_MEAN, Lambda_SD, re_SD, W1_SD, W2_SD, W3_SD, b1_SD, b2_SD, b3_SD, Sigma_SD);
 end
-
 
 Lambda_Hist = [];
 re_Hist     = [];
@@ -179,7 +181,7 @@ while iSample <= FinalSample
     b3_Hist(iSample,:)   = b3;
     Sigma_Hist(iSample)  = Sigma;
     Noise  = normrnd(0.0, Sigma);  
-    %WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
+    WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise);
     
   elseif (UseSamplesFlg == 0)
     [Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist] = ComputeParametersSamples(iSample, Lambda_MEAN, Lambda_SD, re_MEAN, re_SD, W1_MEAN, W1_SD, W2_MEAN, W2_SD, W3_MEAN, W3_SD, b1_MEAN, b1_SD, b2_MEAN, b2_SD, b3_MEAN, b3_SD, Sigma_MEAN, Sigma_SD, Lambda_Hist, re_Hist, W1_Hist, W2_Hist, W3_Hist, b1_Hist, b2_Hist, b3_Hist, Sigma_Hist);
@@ -197,11 +199,12 @@ while iSample <= FinalSample
   
   %% ADDING SHIFTS
   RMaxVec      = [RMin, 100.0, 100.0];
-  [PredAsympt] = ComputeOutput(RMaxVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+  [Temp, PredAsympt] = ComputeOutput(RMaxVec, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
   % PredAsympt   = 0.0;
   
   %% COMPUTING OUTPUT @ TRAINING DATA
-  [EPred]              = ComputeOutput(RData, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise) - PredAsympt;
+  [Temp, EPred]    = ComputeOutput(RData, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+  EPred                = EPred - PredAsympt;
   EDataPred(iSample,:) = EPred;
   EDataSum(:)          = EDataSum(:)   + EPred;
   EDataSqSum(:)        = EDataSqSum(:) + EPred.^2;
@@ -210,7 +213,8 @@ while iSample <= FinalSample
   %% COMPUTING OUTPUT @ 3D VIEWS DATA
   if (ComputePlot)
     for iPlot=1:NPlots
-      [EPred]                = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise) - PredAsympt;
+      [Temp, EPred]          = ComputeOutput(squeeze(RPlot(iPlot,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+      EPred                  = EPred - PredAsympt;
       %EPlot(iSample,iPlot,:) = EPred;
       EPlotSum(iPlot,:)      = EPlotSum(iPlot,:)   + EPred';
       EPlotSqSum(iPlot,:)    = EPlotSqSum(iPlot,:) + EPred'.^2;
@@ -223,7 +227,8 @@ while iSample <= FinalSample
   %% COMPUTING OUTPUT @ CUT DATA
   if (ComputeCut)
     for iCut=1:NCuts
-      [EPred]                  = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise) - PredAsympt;
+      [Temp, EPred]            = ComputeOutput(squeeze(RCutPred(iCut,:,:)), Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+      EPred                    = EPred - PredAsympt;
       ECutPred(iCut,iSample,:) = EPred';
       ECutSum(iCut,:)          = ECutSum(iCut,:)   + EPred';
       ECutSqSum(iCut,:)        = ECutSqSum(iCut,:) + EPred'.^2;
@@ -251,7 +256,7 @@ end
 %% PLOTTING SCATTERS & COMPUTING ERROR
 if (ComputeScatter)
   EDataPredTemp = 0.0;
-  [iFigure] = PlotScatterStoch(iFigure, RData, EData, EDataDiat, EFitted, EDataPred, EDataMean, EDataSD);
+  [iFigure] = PlotScatterStoch(iFigure, RData, EData, EDataDiat, EFitted, EDataPred, EDataPred, EDataMean, EDataSD);
 end
 %%
 

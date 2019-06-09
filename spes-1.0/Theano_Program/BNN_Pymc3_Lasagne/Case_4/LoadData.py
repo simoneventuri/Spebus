@@ -97,7 +97,7 @@ def load_data(NNInput):
     ##################################################################################################################################
     # LOADING DATA
     ##################################################################################################################################
-    PathToLabeledInput = NNInput.PathToDataFldr + '/R.csv'
+    PathToLabeledInput = NNInput.PathToDataFldr + '/R_Plus400.csv'
     RDataOrig          = load_labeled_input(PathToLabeledInput)
     if (NNInput.AddDiatPointsFlg):
         PathToLabeledInput = NNInput.PathToDataFldr + '/DiatPoints.csv'
@@ -116,7 +116,7 @@ def load_data(NNInput):
     # else:
     #     yData = load_labels(NNInput.PathToLabels)
 
-    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_001Noise.csv'
+    PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_Plus400.csv'
     yDataOrig                     = load_labels(PathToLabels)
     yDataDiatOrig, dyDataDiatOrig = V_Diat_MAT(NNInput, RDataOrig)
     yDataTriatOrig                = yDataOrig + 0.0 #- yDataDiatOrig

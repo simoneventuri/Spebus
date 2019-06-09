@@ -1,6 +1,9 @@
 function WriteSampledParams(OutputFolder, iSample, Lambda, re, W1, W2, W3, b1, b2, b3, Sigma, Noise)
 
   global NHL
+  
+  OutputFolder = strcat(OutputFolder, '/CalibratedParams/');
+  [status,msg,msgID] = mkdir(OutputFolder);
 
   File   = strcat(OutputFolder, '/Lambda.csv.',num2str(iSample));
   fileID = fopen(File,'w');

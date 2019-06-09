@@ -63,8 +63,8 @@ def load_data(NNInput):
 
     NTot         = RData.shape[0]
     NIn          = RData.shape[1]
-    NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
-    NTest        = NTot - (NTrainValid)
+    #NTrainValid  = math.floor(NTot * (NNInput.PercTrain+NNInput.PercValid))
+    #NTest        = NTot - (NTrainValid)
 
     PathToLabels                  = NNInput.PathToDataFldr + '/EFitted_10000Points.csv'
     yDataOrig                     = load_labels(PathToLabels)

@@ -103,24 +103,12 @@ def build_MLP_model(NNInput):
             return cls(**config)
 
 
-    # kW1 = NNInput.kWeightDecay[0]
-    # kW2 = NNInput.kWeightDecay[1]
-    # Layer1 = MorseFun_Layer(NNInput.NLayers[2])
-    # Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2))
-    # Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2))
-    # Layer4 = layers.Dense(units=NNInput.NLayers[5],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2))
-    # #Layer4 = layers.Dense(units=NNInput.NLayers[5], activation=NNInput.ActFun[4], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2))
-    # #Layer5 = layers.Dense(units=NNInput.NLayers[6],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1,l2=kW2))
-    # #Layer5 = GaussianNoiseCalib(.1)
-    # Layer6 = layers.GaussianNoise(0.001)
-
-
     kW1 = NNInput.kWeightDecay[0]
     kW2 = NNInput.kWeightDecay[1]
     Layer1 = MorseFun_Layer(NNInput.NLayers[2])
-    Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
-    Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
-    Layer4 = layers.Dense(units=NNInput.NLayers[5],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros')
+    Layer2 = layers.Dense(units=NNInput.NLayers[3], activation=NNInput.ActFun[2], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1, l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1, l2=kW2))
+    Layer3 = layers.Dense(units=NNInput.NLayers[4], activation=NNInput.ActFun[3], use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1, l2=kW2), bias_regularizer=tf.keras.regularizers.l1_l2(l1=kW1, l2=kW2))
+    Layer4 = layers.Dense(units=NNInput.NLayers[5],                               use_bias=True, kernel_initializer='glorot_normal', bias_initializer='zeros', kernel_regularizer=tf.keras.regularizers.l1_l2(l1=kW1, l2=kW2))
     #Layer6 = layers.GaussianNoise(0.001)
 
     # RTemp = tf.Variable([[1.0, 2.0, 3.0],[4.0, 5.0, 6.0]])
@@ -152,7 +140,7 @@ def build_MLP_model(NNInput):
     elif (NNInput.LossFunction == 'rmse'):
         model.compile(loss=rmse, optimizer=optimizer, metrics=[rmse])
     elif (NNInput.LossFunction == 'mse'):
-        model.compile(loss='mse', optimizer=optimizer, metrics=[rmseexp])
+        model.compile(loss='mse', optimizer=optimizer, metrics=[rmse])
     elif (NNInput.LossFunction == 'rmsenorm'):
         model.compile(loss=rmsenorm, optimizer=optimizer, metrics=[rmse])
     elif (NNInput.LossFunction == 'mean_squared_logarithmic_error'):

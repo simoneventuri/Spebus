@@ -1,4 +1,4 @@
-function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDataPred, EDataMean, EDataSD)
+function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDataPred, EDataPredTot, EDataMean, EDataSD)
 
   global AxisFontSz AxisFontNm AxisLabelSz AxisLabelNm LegendFontSz LegendFontNm SaveFigs FigDirPath RedClr GreenClr
 
@@ -6,19 +6,19 @@ function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDa
     
   
   if (OnlyTriatFlg)
-    EData   = EData   + EDiatData;
-    EFitted = EFitted + EDiatData;
+    EDataTot   = EData   + EDiatData;
+    EFittedTot = EFitted + EDiatData;
   else
-    EData   = EData + PRedShift;
+    EDataTot   = EData + PRedShift;
   end
-  NData = size(EData,1);
+  NData = size(EDataTot,1);
   
   
   fig = figure(iFigure);
   
   sz  = ones(NData,1).*40;
   clr = repmat(GreenClr, [NData,1]);
-  h1=scatter(EData,EFitted,sz,clr,'filled');
+  h1=scatter(EDataTot,EFittedTot,sz,clr,'filled');
   hold on
   
 %   for i=1:size(EDataPred,1)
@@ -27,10 +27,10 @@ function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDa
 %   end
   sz  = ones(NData,1).*30;
   clr = repmat(RedClr, [NData,1]);
-  h2=errorbar(EData,EDataMean,NSigmaInt.*EDataSD,'o','MarkerSize',6,'MarkerEdgeColor',RedClr,'MarkerFaceColor',RedClr);
+  h2=errorbar(EDataTot,EDataMean,NSigmaInt.*EDataSD,'o','MarkerSize',6,'MarkerEdgeColor',RedClr,'MarkerFaceColor',RedClr);
   plot([0.0, 80.0],[0.0, 80.0],'k-');
   for i=1:length(CheckPostVec)
-    plot([EData(CheckPostVec(i)),EData(CheckPostVec(i))],[0,80],'k-');
+    plot([EDataTot(CheckPostVec(i)),EDataTot(CheckPostVec(i))],[0,80],'k-');
   end
   pbaspect([1,1,1])
 
@@ -63,13 +63,13 @@ function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDa
   for i=1:length(CheckPostVec)
     fig = figure(iFigure);
     
-    h    = histogram(EDataPred(:,CheckPostVec(i)),50);
+    h    = histogram(EDataPredTot(:,CheckPostVec(i)),50);
     [maxh, Idx] = max(h.Values);
     xIdx = (h.BinEdges(Idx)-h.BinEdges(Idx-1))/2;
-    h1=histfit(EDataPred(:,CheckPostVec(i)),80,'Norm');
+    h1=histfit(EDataPredTot(:,CheckPostVec(i)),80,'Norm');
     hold on
-    h2=plot([EData(CheckPostVec(i)),EData(CheckPostVec(i))],[0,maxh],'g-');
-    h3=plot([EFitted(CheckPostVec(i)),EFitted(CheckPostVec(i))],[0,maxh],'k-');
+    h2=plot([EDataTot(CheckPostVec(i)),EDataTot(CheckPostVec(i))],[0,maxh],'g-');
+    h3=plot([EFittedTot(CheckPostVec(i)),EFittedTot(CheckPostVec(i))],[0,maxh],'k-');
     
     clab = legend([h1,h2,h3],{' ',' '});
     clab.Interpreter = 'latex';
@@ -98,6 +98,6 @@ function [iFigure] = PlotScatterStoch(iFigure, R, EData, EDiatData, EFitted, EDa
     iFigure = iFigure+1;
   end
   
-  [iFigure] = ComputeError(iFigure, EData, EFitted, EDataMean')
+  [iFigure] = ComputeError(iFigure, EDataTot, EFittedTot, EDataMean', EData, EFitted, EDataMean')
   
 end
