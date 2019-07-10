@@ -22,7 +22,7 @@ global NHL MultErrorFlg OnlyTriatFlg PreLogShift UseSamplesFlg StartSample Final
        alphaCutsVec RCutsVec NCuts RStart REnd NPoints Network_Folder GP_Folder PES_Folder RMin EGroupsVec BondOrderFun ...
        NetworkType NOrd System AbscissaConverter MomentaFileName NN_Folder ComputeCu NSigmaInt alphaPlot ...
        NPlots TestFileName DiatMin DiatMax CheckPostVec ShiftForError PIPFun RPlotFile ComputePlot ComputeScatter ComputeCut ...
-       OutputFolder
+       OutputFolder ComputeCutAngle RCutsVecAngle
    
      
 System            = 'O3'    
@@ -33,19 +33,19 @@ PIPFun            = 'Simone'
 NetworkType       = 'NN'
   NHL                  = [6,20,10,1];
   %NOrd                 = 10
-PreLogShift       = 0.0
+PreLogShift       = -3.5
 
 
 AbscissaConverter = 1.0;%0.529177
-RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_1/'                                     % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES1/Case_20_3/Pymc3/'                                   % Where to Find Parameters
-RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES1/Vargas/PlotPES/PES_1/'                                        % Where to Find PESFromGrid.csv.* and RECut.csv.*
-OutputFolder      = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES1/Case_20_3/Pymc3/'  
+RFile             = '/Users/sventuri/WORKSPACE/SPES/spes/Data_PES/O3/Triat/PES_9/'                              % Where to Find R.csv, EOrig.csv and EFitted.csv
+Network_Folder    = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES9/Pymc3/'                                   % Where to Find Parameters
+RPlotFile         = '/Users/sventuri/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                 % Where to Find PESFromGrid.csv.* and RECut.csv.*
+OutputFolder      = '/Users/sventuri/WORKSPACE/SPES/Output_TESTS/PES9/Pymc3/'  
   
 
-UseSamplesFlg     = 3 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin Hypercube Samples; =2: Reads Samples from Pymc3; =3: Max Posterior from Pymc3's Posteriors.
+UseSamplesFlg     = 1 % =0: Samples from Pymc3's Posteriors; =1: Computes Latin Hypercube Samples; =2: Reads Samples from Pymc3; =3: Max Posterior from Pymc3's Posteriors.
   StartSample          = 1
-  FinalSample          = 1
+  FinalSample          = 50
   SaveSampledOutputFlg = false
   
 
@@ -63,9 +63,12 @@ ComputePlot       = false
   NPoints              = 150
 
   
-ComputeCut       = true
+ComputeCut       = false
   alphaCutsVec         = [60,110,116.75,170]
   RCutsVec             = [2.64562, 2.26767, 2.28203327, 2.26767] * AbscissaConverter
+  
+ComputeCutAngle  = true
+  RCutsVecAngle        = [2.64562, 3.21253] * AbscissaConverter
 %%
 
 
@@ -117,6 +120,27 @@ for iCut=1:NCuts
 end
 
 
+NPtCut2         = 3000;
+[RCutAngle, ECutAngle, EFittedCutAngle, RCutPredAngle, AngleVec, AngFake] = ReadCutDataAngle(RData, EData, EFitted, NPtCut2);
+RTemp           = RCutAngle;
+[ECutDiat]      = ComputeDiat(RTemp);
+ECutAngle       = ECutAngle  + ECutDiat';
+EFittedCut      = EFittedCutAngle + ECutDiat';
+clear RTemp ECutDiatAngle
+filename = '/Users/sventuri/WORKSPACE/CG-QCT/run_O3_PES9/Test/PlotPES/PES_1/PESFromReadPoints.csv';
+delimiter = ',';
+startRow = 2;
+formatSpec = '%f%f%f%f%[^\n\r]';
+fileID = fopen(filename,'r');
+dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter, 'EmptyValue' ,NaN,'HeaderLines' ,startRow-1, 'ReturnOnError', false, 'EndOfLine', '\r\n');
+fclose(fileID);
+Temp1     = dataArray{:, 1};
+RCutAngleFake = dataArray{:, 2};
+Temp2     = dataArray{:, 3};
+ECutAngleFake = dataArray{:, 4};
+clearvars filename delimiter startRow formatSpec fileID dataArray ans;
+
+
 %% LOADING PIP'S PARAMETERS
 %[G_MEAN, G_SD] = ReadScales();
 G_MEAN=0.0;G_SD=0.0;
@@ -149,6 +173,7 @@ EPlotSqSum = zeros(NPlots,size(RPlot,2));
 ECutPred   = zeros(NCuts,NSamples,NPtCut);
 ECutSum    = zeros(NCuts,NPtCut);
 ECutSqSum  = zeros(NCuts,NPtCut);
+ECutAnglePred  = zeros(NSamples,NPtCut2);
 iSample    = StartSample;
 while iSample <= FinalSample
   iSample
@@ -234,6 +259,13 @@ while iSample <= FinalSample
       ECutSqSum(iCut,:)        = ECutSqSum(iCut,:) + EPred'.^2;
       clear EPred
     end
+  end
+  
+  if (ComputeCutAngle)
+    [Temp, EPred]            = ComputeOutput(RCutPredAngle, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, b3, Noise);
+    EPred                    = EPred - PredAsympt;
+    ECutAnglePred(iSample,:) = EPred';
+    clear EPred
   end
   %%
   
