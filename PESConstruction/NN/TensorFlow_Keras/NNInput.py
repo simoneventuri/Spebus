@@ -10,24 +10,26 @@ class NNInput(object):
     TryNNFlg               = 0
     WriteFinalFlg          = 1         # Int Flag for Writing Parameters; =0: only at the end; =1: only .npz format at each improved iter; =2 .npz and .csv at each improved iter
 
-    Machine = 'ENTROPY'
+    Machine = 'LINUX'
     if (Machine == 'MAC'):
-        PathToSPES  = '/Users/sventuri/WORKSPACE/SPES/spes/'   
-    elif (Machine == 'ENTROPY'):
-        PathToSPES  = '/home/venturi/WORKSPACE/SPES/spes/'
+        PathToSPES       = '/Users/sventuri/WORKSPACE/Spebus/PESConstruction/'   
+        PathToSPESOutput = '/Users/sventuri/WORKSPACE/Spebus_OUTPUT/'   
+    elif (Machine == 'LINUX'):
+        PathToSPES       = '/home/venturi/WORKSPACE/Spebus/PESConstruction/'
+        PathToSPESOutput = '/home/venturi/WORKSPACE/Spebus_OUTPUT/'
 
     # System                 = 'N3'
     # iPES                   = '1'
-    # DiatPot_Fun            = V_N2_DS
-    # DiatPot_FunPrint       = V_N2_LeRoy
     # PreLogShift            = 1.0
-    # PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat_David/PES_' + iPES + '/'
-    System                 = 'O3'
-    iPES                   = '9'
-    DiatPot_Fun            = V_O2_UMN
-    DiatPot_FunPrint       = V_O2_UMN
+    # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
+    # System                 = 'O3'
+    # iPES                   = '9'
+    # PreLogShift            = -3.5
+    # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
+    System                 = 'CNH'
+    iPES                   = '1'
     PreLogShift            = -3.5
-    PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat/PES_' + iPES + '/'
+    PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
