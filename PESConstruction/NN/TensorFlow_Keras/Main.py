@@ -93,7 +93,7 @@ def sgd_optimization(NNInput):
 
     lr_callback  = tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.7, patience=500, mode='auto', min_delta=1.e-6, cooldown=0, min_lr=1.e-8, verbose=1)
 
-    tb_callback  = tf.keras.callbacks.TensorBoard(log_dir=NNInput.CheckpointFldr, histogram_freq=100, batch_size=NNInput.NMiniBatch, write_graph=True, write_grads=True, write_images=True, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None, embeddings_data=None)
+    tb_callback  = tf.keras.callbacks.TensorBoard(log_dir=NNInput.CheckpointFilePath, histogram_freq=100, batch_size=NNInput.NMiniBatch, write_graph=True, write_grads=True, write_images=True, embeddings_freq=0, embeddings_layer_names=None, embeddings_metadata=None, embeddings_data=None)
 
     callbacksVec = [mc_callback, early_stop, tb_callback]
 

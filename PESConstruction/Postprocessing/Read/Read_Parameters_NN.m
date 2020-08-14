@@ -1,0 +1,292 @@
+%% The Function Reads the Parameters of PIP and NN
+%
+function Read_Parameters_NN()
+
+    %%==============================================================================================================
+    % 
+    % Spebus, Machine Learning Toolbox for constructing Deterministic and Stochastic Potential Energy Surfaces 
+    % 
+    % Copyright (C) 2018 Simone Venturi (University of Illinois at Urbana-Champaign). 
+    % 
+    % This program is free software; you can redistribute it and/or modify it under the terms of the 
+    % Version 2.1 GNU Lesser General Public License as published by the Free Software Foundation. 
+    % 
+    % This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+    % without e=ven the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+    % See the GNU Lesser General Public License for more details. 
+    % 
+    % You should have received a copy of the GNU Lesser General Public License along with this library; 
+    % if not, write to the Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA 
+    % 
+    %---------------------------------------------------------------------------------------------------------------
+    %%==============================================================================================================
+
+    global Input Syst PIP NN
+
+    fprintf('  = Read_Parameters_NN (PIP + NN) ====================\n')
+    fprintf('  ====================================================\n')
+
+    fprintf(['  Input.ParamsFldr   = ', Input.ParamsFldr, '\n'])
+
+    
+    PostFix = ' ';
+
+    Folder1 = '/BondOrderLayer/';
+    Folder2 = '/HiddenLayer1/';
+    Folder3 = '/HiddenLayer2/';
+    Folder4 = '/OutputLayer/';
+    
+    %   Folder1 = '/CalibratedParams/';
+    %   Folder2 = '/CalibratedParams/';
+    %   Folder3 = '/CalibratedParams/';
+    %   Folder4 = '/CalibratedParams/';
+    
+    NPIPParams = 1;
+    if strcmp(PIP.BondOrder_Fun, 'MEGFun')
+        NPIPParams = 2;
+    end
+    PIP.Lambda = zeros(3,2);
+    PIP.re     = zeros(3,2);
+    
+    
+    if strcmp(Input.ModelType,'NN')
+        
+        if (NPIPParams == 1)
+
+            filename = strcat(Input.ParamsFldr,Folder1,'/Lambda.csv',PostFix);
+            delimiter = '';
+            formatSpec = '%f%[^\n\r]';
+            fileID = fopen(filename,'r');
+            dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+            fclose(fileID);
+            LambdaTemp = dataArray{:, 1};
+            clearvars filename delimiter formatSpec fileID dataArray ans;
+
+            filename = strcat(Input.ParamsFldr,Folder1,'/re.csv',PostFix);
+            delimiter = '';
+            formatSpec = '%f%[^\n\r]';
+            fileID = fopen(filename,'r');
+            dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+            fclose(fileID);
+            reTemp = dataArray{:, 1};
+            clearvars filename delimiter formatSpec fileID dataArray ans;
+            
+            for iP=1:3
+                iMol = Syst.Pair(iP).ToMol;
+                PIP.Lambda(:,iP) = LambdaTemp(iMol);
+                PIP.re(:,iP)     = reTemp(iMol);
+            end
+            
+        else
+            fprint('CHANGE Read_Parameters_NN!!!')
+            pause
+        end
+
+
+        filename = strcat(Input.ParamsFldr,Folder2,'/b.csv',PostFix);
+        delimiter = '';
+        formatSpec = '%f%[^\n\r]';
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.b1 = dataArray{:, 1};
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+        filename = strcat(Input.ParamsFldr,Folder2,'/W.csv',PostFix);
+        delimiter = ',';
+        formatSpec = '';
+        for i = 1:Input.NHL(2)
+          formatSpec = strcat(formatSpec,'%f');
+        end
+        formatSpec = strcat(formatSpec,'%[^\n\r]');
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.W1 = [dataArray{1:end-1}];
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+
+        filename = strcat(Input.ParamsFldr,Folder3,'/b.csv',PostFix);
+        delimiter = '';
+        formatSpec = '%f%[^\n\r]';
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.b2 = dataArray{:, 1};
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+        filename = strcat(Input.ParamsFldr,Folder3,'/W.csv',PostFix);
+        delimiter = ',';
+        formatSpec = '';
+        for i = 1:Input.NHL(3)
+          formatSpec = strcat(formatSpec,'%f');
+        end
+        formatSpec = strcat(formatSpec,'%[^\n\r]');
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.W2 = [dataArray{1:end-1}];
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+
+        filename = strcat(Input.ParamsFldr,Folder4,'/b.csv',PostFix);
+        delimiter = '';
+        formatSpec = '%f%[^\n\r]';
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.b3 = dataArray{:, 1};
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+        filename = strcat(Input.ParamsFldr,Folder4,'/W.csv',PostFix);
+        delimiter = ',';
+        formatSpec = '';
+        for i = 1:Input.NHL(4)
+          formatSpec = strcat(formatSpec,'%f');
+        end
+        formatSpec = strcat(formatSpec,'%[^\n\r]');
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.W3 = [dataArray{1:end-1}];
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+
+
+    %     filename = strcat(Input.ParamsFldr,Folder1,'/Lambda.csv',PostFix)
+    %     delimiter = '';
+    %     formatSpec = '%f%[^\n\r]';
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     LambdaTemp = dataArray{:, 1};
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    %     PIP.Lambda = LambdaTemp;
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder1,'/re.csv',PostFix)
+    %     delimiter = '';
+    %     formatSpec = '%f%[^\n\r]';
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     reTemp = dataArray{:, 1};
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    %     PIP.re = reTemp;
+    % 
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder2,'/b1.csv',PostFix)
+    %     delimiter = '';
+    %     formatSpec = '%f%[^\n\r]';
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.b1 = dataArray{:, 1};
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder2,'/W1.csv',PostFix)
+    %     delimiter = ',';
+    %     formatSpec = '';
+    %     for i = 1:Input.NHL(2)
+    %       formatSpec = strcat(formatSpec,'%f');
+    %     end
+    %     formatSpec = strcat(formatSpec,'%[^\n\r]');
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.W1 = [dataArray{1:end-1}];
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    % 
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder3,'/b2.csv',PostFix)
+    %     delimiter = '';
+    %     formatSpec = '%f%[^\n\r]';
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.b2 = dataArray{:, 1};
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder3,'/W2.csv',PostFix)
+    %     delimiter = ',';
+    %     formatSpec = '';
+    %     for i = 1:Input.NHL(3)
+    %       formatSpec = strcat(formatSpec,'%f');
+    %     end
+    %     formatSpec = strcat(formatSpec,'%[^\n\r]');
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.W2 = [dataArray{1:end-1}];
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    % 
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder4,'/b3.csv',PostFix)
+    %     delimiter = '';
+    %     formatSpec = '%f%[^\n\r]';
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.b3 = dataArray{:, 1};
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    % 
+    %     filename = strcat(Input.ParamsFldr,Folder4,'/W3.csv',PostFix)
+    %     delimiter = ',';
+    %     formatSpec = '';
+    %     for i = 1:Input.NHL(4)
+    %       formatSpec = strcat(formatSpec,'%f');
+    %     end
+    %     formatSpec = strcat(formatSpec,'%[^\n\r]');
+    %     fileID = fopen(filename,'r');
+    %     dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+    %     fclose(fileID);
+    %     NN.W3 = [dataArray{1:end-1}];
+    %     clearvars filename delimiter formatSpec fileID dataArray ans;
+    %     
+
+
+    elseif strcmp(Input.ModelType,'Pol')
+
+        filename = strcat(Input.ParamsFldr,'/Lambda.csv');
+        delimiter = '';
+        formatSpec = '%f%[^\n\r]';
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        LambdaTemp = dataArray{:, 1};
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+        PIP.Lambda = LambdaTemp;
+
+        filename = strcat(Input.ParamsFldr,'/re.csv');
+        delimiter = '';
+        formatSpec = '%f%[^\n\r]';
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        reTemp = dataArray{:, 1};
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+        PIP.re = reTemp;
+
+        filename = strcat(Input.ParamsFldr,'/PolLayer/W.csv');
+        delimiter = ',';
+        formatSpec = '';
+        for i = 1:1
+          formatSpec = strcat(formatSpec,'%f');
+        end
+        formatSpec = strcat(formatSpec,'%[^\n\r]');
+        fileID = fopen(filename,'r');
+        dataArray = textscan(fileID, formatSpec, 'Delimiter', delimiter,  'ReturnOnError', false);
+        fclose(fileID);
+        NN.W1 = [dataArray{1:end-1}];
+        clearvars filename delimiter formatSpec fileID dataArray ans;
+
+        NN.W2 = 0.0;
+        NN.W3 = 0.0;
+        NN.b1 = 0.0;
+        NN.b2 = 0.0;
+        NN.b3 = 0.0;
+
+    end
+
+    fprintf('  ====================================================\n\n')
+
+end

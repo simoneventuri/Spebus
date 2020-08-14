@@ -1,0 +1,261 @@
+% -- MATLAB --
+%%==============================================================================================================
+% 
+% Spebus, Machine Learning Toolbox for constructing Deterministic and Stochastic Potential Energy Surfaces 
+% 
+% Copyright (C) 2018 Simone Venturi (University of Illinois at Urbana-Champaign). 
+% 
+% This program is free software; you can redistribute it and/or modify it under the terms of the 
+% Version 2.1 GNU Lesser General Public License as published by the Free Software Foundation. 
+% 
+% This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+% without e=ven the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+% See the GNU Lesser General Public License for more details. 
+% 
+% You should have received a copy of the GNU Lesser General Public License along with this library; 
+% if not, write to the Free Software Foundation, Inc. 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA 
+% 
+%---------------------------------------------------------------------------------------------------------------
+%%==============================================================================================================
+
+close all
+clear all
+clc
+
+global Input Param Syst Data ThreeD Cut PIP NN
+
+
+Input.WORKSPACE_PATH     = '/home/venturi/WORKSPACE/';
+Input.TrainingFldr       = strcat(Input.WORKSPACE_PATH, '/Spebus/PESConstruction/AbInitio_Data/O3/UMN_AbInitio/Triat/PES_9/'); % Where to Find R.csv, EOrig.csv and EFitted.csv
+Input.ParamsFldr         = strcat(Input.WORKSPACE_PATH, '/Spebus_OUTPUT/Output_LINUX/O3_PES9/TensorFlow/');                    % Where to Find Parameters
+Input.TestingFldr        = strcat(Input.WORKSPACE_PATH, '/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/');                         % Where to Find PESFromGrid.csv.* and RECut.csv.*
+
+Input.SystNameLong       = {'O3_UMN'};
+Input.iPES               = 9;
+Input.Suffix             = '';
+Input.RunSuffix          = '';
+
+Input.rUnits             = {'a0'}; % 'a0' / 'A'
+Input.VUnits             = {'eV'}; % 'eV' / 'Eh' / 'KCal/mol'
+
+Input.ModelType          = {'NN'};
+Input.NHL                = [6,20,10,1];
+Input.BondOrder_Fun      = {'MorseFun'};
+Input.PIPFun             = [{'Simone'}];
+
+Input.MultErrorFlg       = true;   
+Input.PreLogShift        = 3.5;
+Input.OnlyTriatFlg       = true;
+
+
+%
+Input.CheckDers.Flg      = false;
+Input.CheckDers.AngVec   = [60.0,110,116.75,170];
+%
+Input.Scatter.Flg        = true  
+Input.Scatter.Shift      = 26.3*0.04336411530877
+Input.Scatter.VGroupsVec = [2.0, 4.0, 6.0, 8.0, 10.0, 15.0, 20.0, 25.0, 30.0, 50.0, 100.0, 1000.0]; %[4.336, 8.673, 21.68, 43.364, 100.0]
+%
+Input.ThreeD.Flg         = true
+Input.ThreeD.AngVec      = [50:20:160] %[[35:5:175],[106.75:10:126.75]]
+Input.ThreeD.rStart      = 1.5
+Input.ThreeD.rEnd        = 10.0
+Input.ThreeD.NPoints     = 150
+%
+Input.Cuts.Flg           = true
+Input.Cuts.AngVec        = [60,110,116.75,170]
+Input.Cuts.rVec          = [2.64562, 2.26767, 2.28203327, 2.26767]
+
+
+  
+%% Inputs for Plotting
+Input.iFig               = 101;
+Input.SaveFigsFlgInt     = 0;
+Input.Paths.SaveFigsFldr = strcat(Input.WORKSPACE_PATH, '/Spebus_OUTPUT/Output_FINAL/PES9/');
+Input.FigureFormat       = 'PrePrint';
+
+%% Inputs for Saving Data
+Input.Paths.SaveDataFldr = strcat(Input.WORKSPACE_PATH, '/Spebus_OUTPUT/Output_FINAL/PES9/');
+Input.ReLoad             = 1;
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Initializing
+fprintf("Initializing\n")
+Syst.NameLong = Input.SystNameLong;
+Syst          = Initialize_ChemicalSyst_Spebus(Syst)
+Initialize_Parameters_Spebus()
+Initialize_Input_Spebus()
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing Diatomic Potentials' Properties (rMin, VMin, VInf)
+fprintf("Computing Diatomic Potentials' Properties\n\n")
+Syst.rMin = 0.0;
+Syst.VMin = 1.e10;
+for iP=1:3
+    iMol = Syst.Pair(iP).ToMol;
+    Syst.Molecule(iMol).rMin = fzero(@(x) DiatPotdV_Spebus(x, 0, iMol), 1.2);
+    Syst.Molecule(iMol).VMin = DiatPot_Spebus(Syst.Molecule(iMol).rMin,  0, iMol);
+    
+    if (Syst.VMin > Syst.Molecule(iMol).VMin)
+        Syst.rMin = Syst.Molecule(iMol).rMin;
+        Syst.VMin = Syst.Molecule(iMol).VMin;
+    end
+    
+    Syst.Molecule(iMol).VInf = DiatPot_Spebus(100.0, 0, iMol);
+end
+%Syst.rMin = 100.0;
+%Syst.VMin = DiatPot_Spebus(Syst.rMin, 0, 1);
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Reading Labeled Data
+Read_LabeledData();
+Data.EDiat  = Compute_DiatPots(Data.R);
+Data.RR     = sqrt(Data.R(:,1).^2 + Data.R(:,2).^2 + Data.R(:,3).^2);
+[Val,Idx]   = max(Data.RR);
+Data.VInf   = Data.E(Idx);             
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Reading Unlabeled Data for 3D Plotting
+Read_ThreeDData();
+for iPlot=1:Input.ThreeD.NPlots
+    RTemp                 = squeeze(ThreeD.R(iPlot,:,:));
+    ETemp                 = Compute_DiatPots(RTemp);
+    ThreeD.EDiat(iPlot,:) = ETemp';
+    ThreeD.E(iPlot,:)     = ThreeD.E(iPlot,:);% + ThreeD.EDiat(:,iPlot) - Syst.VMin;
+    clear RTemp ETemp
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Reading Unlabeled Data for 2D-Cut Plots
+NPtCut = 1000;
+Read_CutData(NPtCut);
+for iCut=1:Input.Cuts.NCuts
+    RTemp                              = squeeze(Cut.R(iCut,1:Cut.NData(iCut),1:3));
+    ETemp                              = Compute_DiatPots(RTemp);
+    Cut.E(iCut,1:Cut.NData(iCut))      = Cut.E(iCut,1:Cut.NData(iCut))    + ETemp';
+    Cut.EFit(iCut,1:Cut.NData(iCut))   = Cut.EFit(iCut,1:Cut.NData(iCut)) + ETemp';
+    clear RTemp ETemp
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Loading Normalization Parameters
+%Read_Scales();
+Data.G_MEAN=0.0; Data.G_SD=0.0;
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Loading NN's Parameters
+Read_Parameters_NN();
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing Derivatives
+if (Input.CheckDers.Flg)
+    Compute_PESDerivatives()
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing Asymptotic Value of NN
+RMaxVec         = [Syst.rMin, 100.0, 100.0];
+[Temp, NN.VInf] = Compute_Output_NN(RMaxVec);
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing NN Output at Labeled Data Location (for Scatter Plots)
+[Data.EPred, Data.EPredTot] = Compute_Output_NN(Data.R);
+Data.EPredTot               = Data.EPredTot - NN.VInf;
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing NN Output @ Unlabeled Data Locations for 3D Plots
+if (Input.ThreeD.Flg)
+    ThreeD.EPred = zeros(Input.ThreeD.NPlots,size(ThreeD.R,2));
+    for iPlot=1:Input.ThreeD.NPlots
+        [Temp, ThreeD.EPred(iPlot,:)] = Compute_Output_NN(squeeze(ThreeD.R(iPlot,:,:)));
+        ThreeD.EPred(iPlot,:)         = ThreeD.EPred(iPlot,:) - NN.VInf;
+    end
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Computing NN Output @ Unlabeled Data Locations for 2D Cuts
+if (Input.Cuts.Flg)
+    Cut.EPred = zeros(Input.Cuts.NCuts,NPtCut);
+    for iCut=1:Input.Cuts.NCuts
+        [Temp, Cut.EPred(iCut,:)] = Compute_Output_NN(squeeze(Cut.RPred(iCut,:,:)));
+        Cut.EPred(iCut,:)         = Cut.EPred(iCut,:) - NN.VInf;
+    end
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plotting Scatter Plots
+Plot_Scatter();
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Writing 3D Views
+if (Input.ThreeD.Flg)
+    Write_Output_ThreeD();
+end
+%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Plotting Cuts
+if (Input.Cuts.Flg)
+    Plot_Cuts();
+end
+%%
+
+
+
+%figure(100)
+%PlotDiatomicPot(100, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
+
+
+% R = linspace(1.5,6.0,3000);
+% [VOld,dV]=N2_MRCI(R);
+% [VNew,dV]=N2_LeRoy(R);
+% figure
+% plot(R,VOld)
+% hold on
+% plot(R,VNew)
+
+% R = linspace(1.5,15.0,3000);
+% p = exp( - Lambda_Det(1) .* (R - re_Det(1)) - Lambda_Det(2) .* (R - re_Det(2)).^2 )';
+% p = exp( - Lambda_Det(1) .* (R - re_Det(1)) )';
+% figure(10)
+% plot(R,p)
+
+% NbVecs   = [0,1,2,3,4,6,7,9,11,13,15,17,19,21];
+% iEnd   = 0;
+% figure
+% for iOrd=1:NOrd
+%   iStart = iEnd   + 1;
+%   iEnd   = iStart + NbVecs(iOrd) - 1;
+%   Coeff  = W1_Det(iStart:iEnd);
+%   hold on
+%   plot(Coeff,'o');
+% end

@@ -18,22 +18,19 @@ class NNInput(object):
         PathToSPES       = '/home/venturi/WORKSPACE/Spebus/PESConstruction/'
         PathToSPESOutput = '/home/venturi/WORKSPACE/Spebus_OUTPUT/'
 
+
     # System                 = 'N3'
     # iPES                   = '1'
     # DiatPot_Fun            = V_N2_DS
     # DiatPot_FunPrint       = V_N2_LeRoy
     # PreLogShift            = 1.0
-    # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
+    # PathToDataFldr         = PathToSPES + '/Data_PES/'  + System  + '/Triat_David/PES_' + iPES + '/'
     System                 = 'O3'
     iPES                   = '9'
     DiatPot_Fun            = V_O2_UMN
     DiatPot_FunPrint       = V_O2_UMN
     PreLogShift            = -3.5
     PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/UMN_AbInitio/Triat/PES_' + str(iPES) + '/'
-    # System                 = 'CNH'
-    # iPES                   = '1'
-    # PreLogShift            = -3.5
-    # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
@@ -45,10 +42,10 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPESOutput + '/Output_FINAL/PES9/TensorFlow/'
-        PathToWeightFldr       = PathToSPESOutput + '/Output_FINAL/PES9/TensorFlow/'
-        CheckpointFilePath     = PathToSPESOutput + '/Output_FINAL/Training_PES9/cp.ckpt'    
-        CheckpointFldr         = PathToSPESOutput + '/Output_FINAL/Training_PES9/'    
+        PathToOutputFldr       = PathToSPESOutput + '/Output_' + Machine + '/' + System + '_' + 'PES' + str(iPES) + '/TensorFlow/'
+        PathToWeightFldr       = PathToSPESOutput + '/Output_' + Machine + '/' + System + '_' + 'PES' + str(iPES) + '/TensorFlow/'
+        CheckpointFilePath     = PathToSPESOutput + '/Output_' + Machine + '/' + System + '_' + 'PES' + str(iPES) + '/Training/cp.ckpt'    
+        CheckpointFldr         = PathToSPESOutput + '/Output_' + Machine + '/' + System + '_' + 'PES' + str(iPES) + '/Training/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -66,8 +63,8 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[0.0, 0.0, 0.0],[0.0, 0.0, 0.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_' + Machine + '/PIP_Determ_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
-        PathToWeightFldr       = PathToSPES + '/../Output_' + Machine + '/PIP_Determ_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToOutputFldr       = PathToSPESOutput + '/Output_' + Machine + '/PIP_Determ_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
+        PathToWeightFldr       = PathToSPESOutput + '/Output_' + Machine + '/PIP_Determ_' + str(NHid[0]) + '_' + str(NHid[1]) + '_Triat/' + System + '_' + iPES + '/'
  
     GenDataFlg             = False
     NIn                    = 3
