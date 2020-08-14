@@ -70,7 +70,7 @@ if strcmp(System,'N3')
   [DiatMin, dE1] = N2_LeRoy(RMin);
   %[DiatMin, dE1] = N2_MRCI(RMin)
 elseif strcmp(System,'O3')
-  [DiatMin, dE1] = O2_UMN(RMin);
+  [DiatMin, dE1] = O2_UMN_Spebus(RMin);
 end
 
 

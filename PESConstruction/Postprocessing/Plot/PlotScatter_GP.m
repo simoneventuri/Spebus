@@ -12,8 +12,8 @@ function [iFigure] = Plotscatter_GP(iFigure, R, EData, EDiatData, EFitted, G_MEA
     %[FittedShift, dE1] = N2_MRCI(2.088828)
     [PRedShift, dE1]   = N2_LeRoy(RMin);
   elseif strcmp(System,'O3')
-    [FittedShift, dE1] = O2_UMN(RMin);
-    [PRedShift, dE1]   = O2_UMN(RMin);
+    [FittedShift, dE1] = O2_UMN_Spebus(RMin);
+    [PRedShift, dE1]   = O2_UMN_Spebus(RMin);
   end
   
 

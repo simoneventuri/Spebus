@@ -65,9 +65,9 @@ function [RDataDiat, EDataDiat] = ReadDataDiat()
   clearvars filename delimiter startRow formatSpec fileID dataArray ans raw col numericData rawData row regexstr result numbers invalidThousandsSeparator thousandsRegExp me;
   RDataDiat = [R1, R2, R3];
   
-  [E1, dE1] = O2_UMN(R1);
-  [E2, dE2] = O2_UMN(R2);
-  [E3, dE3] = O2_UMN(R3);
+  [E1, dE1] = O2_UMN_Spebus(R1);
+  [E2, dE2] = O2_UMN_Spebus(R2);
+  [E3, dE3] = O2_UMN_Spebus(R3);
   EDataDiat = E1 + E2 + E3;
 
 end

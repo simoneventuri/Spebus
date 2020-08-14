@@ -14,8 +14,8 @@ function PlotDiatomicPot(iFigure, Lambda, re, G_MEAN, G_SD, W1, W2, W3, b1, b2, 
     [EData, dE]    = N2_LeRoy(R1'./AbscissaConverter);
     [EDataInf, te] = N2_LeRoy(1.d2');
   elseif strcmp(System,'O3')
-    [EData, dE]    = O2_UMN(R1'./AbscissaConverter);
-    [EDataInf, te] = O2_UMN(1.d2');
+    [EData, dE]    = O2_UMN_Spebus(R1'./AbscissaConverter);
+    [EDataInf, te] = O2_UMN_Spebus(1.d2');
   end
   size(EData);
   

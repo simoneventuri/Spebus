@@ -76,7 +76,7 @@ function [EPred, EPredTot] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, 
     end
     
     EPred = Sum' .* 0.159360144e-2.*27.2113839712790;
-    [VShift, dV] = O2_UMN(RMin);
+    [VShift, dV] = O2_UMN_Spebus(RMin');
     EPred = EPred - VShift;
     
   end 
@@ -91,9 +91,9 @@ function [EPred, EPredTot] = ComputeOutput(R, Lambda, re, G_MEAN, G_SD, W1, W2, 
       [E2, dE2] = N2_LeRoy(R(:,2)'./AbscissaConverter);
       [E3, dE3] = N2_LeRoy(R(:,3)'./AbscissaConverter);
     elseif strcmp(System,'O3')
-      [E1, dE1] = O2_UMN(R(:,1)'./AbscissaConverter);
-      [E2, dE2] = O2_UMN(R(:,2)'./AbscissaConverter);
-      [E3, dE3] = O2_UMN(R(:,3)'./AbscissaConverter);
+      [E1, dE1] = O2_UMN_Spebus(R(:,1)./AbscissaConverter);
+      [E2, dE2] = O2_UMN_Spebus(R(:,2)./AbscissaConverter);
+      [E3, dE3] = O2_UMN_Spebus(R(:,3)./AbscissaConverter);
     end
     EDiat = E1 + E2 + E3;
     EPredTot = EPred + EDiat;

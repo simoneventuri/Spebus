@@ -50,9 +50,9 @@ function [EPred] = ComputeOutput_GP(R, G_MEAN, G_SD, ModPip, re, Obs_Idx_Pts, Am
       [E2, dE2] = N2_LeRoy(R(:,2)'./AbscissaConverter);
       [E3, dE3] = N2_LeRoy(R(:,3)'./AbscissaConverter);
     elseif strcmp(System,'O3')
-      [E1, dE1] = O2_UMN(R(:,1)'./AbscissaConverter);
-      [E2, dE2] = O2_UMN(R(:,2)'./AbscissaConverter);
-      [E3, dE3] = O2_UMN(R(:,3)'./AbscissaConverter);
+      [E1, dE1] = O2_UMN_Spebus(R(:,1)'./AbscissaConverter);
+      [E2, dE2] = O2_UMN_Spebus(R(:,2)'./AbscissaConverter);
+      [E3, dE3] = O2_UMN_Spebus(R(:,3)'./AbscissaConverter);
     end
     EDiat = E1 + E2 + E3;
     EPred = EPred + EDiat;

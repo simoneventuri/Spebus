@@ -128,7 +128,8 @@ def build_MLP_model(NNInput):
     elif (NNInput.Method == 'adadelta'):
         optimizer = tf.train.AdadeltaOptimizer(NNInput.LearningRate, rho=0.95, epsilon=1e-08, use_locking=False, name='Adadelta')
     elif (NNInput.Method == 'adam'):
-        optimizer = tf.train.AdamOptimizer(NNInput.LearningRate, beta1=0.9, beta2=0.999, epsilon=1e-08, use_locking=False, name='Adam')
+        #optimizer = tf.train.AdamOptimizer(NNInput.LearningRate, beta1=0.9, beta2=0.999, epsilon=1e-08, use_locking=False, name='Adam')
+        optimizer = tf.keras.optimizers.Adam(learning_rate=NNInput.LearningRate, beta_1=0.9, beta_2=0.999, epsilon=1e-07, amsgrad=False, name='Adam')
     elif (NNInput.Method == 'proximal'):
         optimizer = tf.train.ProximalAdagradOptimizer(NNInput.LearningRate, initial_accumulator_value=0.1, l1_regularization_strength=NNInput.kWeightDecay[0], l2_regularization_strength=NNInput.kWeightDecay[1], use_locking=False, name='ProximalAdagrad')
     elif (NNInput.Method == 'nesterov'):

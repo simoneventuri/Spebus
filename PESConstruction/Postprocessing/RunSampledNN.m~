@@ -36,7 +36,7 @@ PreLogShift       = 1
 
 AbscissaConverter = 1.0;%0.529177
 RFile             = 'home/venturi/WORKSPACE/Spebus/PESConstruction/AbInitio_Data/O3/UMN_AbInitio/Triat/PES_9' % Where to Find R.csv, EOrig.csv and EFitted.csv
-Network_Folder    = '/home/venturi/WORKSPACE/Spebus_OUTPUT/Output_FINAL/PES9/TensorFlow/'                            % Where to Find Parameters
+Network_Folder    = '/home/venturi/WORKSPACE/Spebus/Output_FINAL/PES9/TensorFlow/'                            % Where to Find Parameters
 RPlotFile         = '/home/venturi/GoogleDrive/O3_PES9/Vargas/PlotPES/PES_1/'                                 % Where to Find PESFromGrid.csv.* and RECut.csv.*
 
 ComputeScatter    = true  
@@ -126,6 +126,7 @@ else
   [Lambda_Det, re_Det, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det] = ReadParametersDeterm();
 end
 fprintf("  Read Parameters\n\n")
+pause
 
 % %% CHECKING DERIVATIVES
 % AngVec = [60.0,110,116.75,170];
@@ -138,6 +139,7 @@ RMaxVec      = [RMin, 100.0, 100.0];
 [Temp, PredAsympt] = ComputeOutput(RMaxVec, Lambda_Det, re_Det, G_MEAN, G_SD, W1_Det, W2_Det, W3_Det, b1_Det, b2_Det, b3_Det, 0.0);
 % PredAsympt   = 0.0;
 fprintf("  Added Shifts\n\n")
+pause
 
 
 %% COMPUTING OUTPUT FOR SCATTER

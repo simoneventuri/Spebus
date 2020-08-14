@@ -81,8 +81,8 @@ if strcmp(System,'N3')
   [DiatMax, dE1] = N2_LeRoy(100.0);
 elseif strcmp(System,'O3')
   RMin           = 2.2820248;
-  [DiatMin, dE1] = O2_UMN(RMin);
-  [DiatMax, dE1] = O2_UMN(100.0);
+  [DiatMin, dE1] = O2_UMN_Spebus(RMin);
+  [DiatMax, dE1] = O2_UMN_Spebus(100.0);
 end
 
 FigDirPath = strcat(Network_Folder, '/Figs/')

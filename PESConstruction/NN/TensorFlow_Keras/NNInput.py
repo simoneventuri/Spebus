@@ -20,16 +20,20 @@ class NNInput(object):
 
     # System                 = 'N3'
     # iPES                   = '1'
+    # DiatPot_Fun            = V_N2_DS
+    # DiatPot_FunPrint       = V_N2_LeRoy
     # PreLogShift            = 1.0
     # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
-    # System                 = 'O3'
-    # iPES                   = '9'
+    System                 = 'O3'
+    iPES                   = '9'
+    DiatPot_Fun            = V_O2_UMN
+    DiatPot_FunPrint       = V_O2_UMN
+    PreLogShift            = -3.5
+    PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/UMN_AbInitio/Triat/PES_' + str(iPES) + '/'
+    # System                 = 'CNH'
+    # iPES                   = '1'
     # PreLogShift            = -3.5
     # PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
-    System                 = 'CNH'
-    iPES                   = '1'
-    PreLogShift            = -3.5
-    PathToDataFldr         = PathToSPES + '/AbInitio_Data/' + System + '/Triat/PES_' + str(iPES) + '/'
 
     Model                  = 'ModPIP'
     BondOrderStr           = 'MorseFun'
@@ -41,10 +45,10 @@ class NNInput(object):
         Lambda                 = numpy.array([[1.0, 1.0, 1.0],[1.0, 1.0, 1.0]])
         re                     = numpy.array([[1.0, 1.0, 0.0],[1.0, 1.0, 1.0]])
         BiasesFlg              = True
-        PathToOutputFldr       = PathToSPES + '/../Output_FINAL/PES9/TensorFlow/'
-        PathToWeightFldr       = PathToSPES + '/../Output_FINAL/PES9/TensorFlow/'
-        CheckpointFilePath     = PathToSPES + '/../Output_FINAL/Training_PES9/cp.ckpt'    
-        CheckpointFldr         = PathToSPES + '/../Output_FINAL/Training_PES9/'    
+        PathToOutputFldr       = PathToSPESOutput + '/Output_FINAL/PES9/TensorFlow/'
+        PathToWeightFldr       = PathToSPESOutput + '/Output_FINAL/PES9/TensorFlow/'
+        CheckpointFilePath     = PathToSPESOutput + '/Output_FINAL/Training_PES9/cp.ckpt'    
+        CheckpointFldr         = PathToSPESOutput + '/Output_FINAL/Training_PES9/'    
     elif (Model=='ModPIPPol'):
         LayersName             = ['InputLayer', 'BondOrderLayer', 'PolLayer']
         NLayers                = [3,1,1]
@@ -73,7 +77,7 @@ class NNInput(object):
     RandomizeDataFlg       = True
     NormalizeDataFlg       = False
 
-    NEpoch                 = 30000
+    NEpoch                 = 3000
     NMiniBatch             = 30
     NPatience              = 1000   
     NDeltaPatience         = 2        
